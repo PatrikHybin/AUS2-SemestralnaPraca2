@@ -13,7 +13,7 @@ public class TwoThreeTree<T extends Comparable<T>> {
     public void insert(T data) {
 
         if (root == null) {
-            root = new TwoThreeNode<T>(data);
+            root = new TwoThreeNode<>(data);
             return;
         }
 
@@ -62,7 +62,6 @@ public class TwoThreeTree<T extends Comparable<T>> {
                     } else {
                         if (node.getParent().getRightData() == null) {
                             //2node parent insert from left
-
                             if (node == node.getParent().getLeftSon()) {
                                 branch = -1;
                             } //2node parent insert from right
@@ -163,7 +162,6 @@ public class TwoThreeTree<T extends Comparable<T>> {
 
             return newNode;
         } else {
-            //pushed node left son will change so we have to reference him now
             node.setCenterSon(pushedNode.getLeftSon());
 
             pushedNode.setLeftData(rightData);
@@ -189,7 +187,6 @@ public class TwoThreeTree<T extends Comparable<T>> {
             node.setLeftData(tmpData);
         }
     }
-
 
     private TwoThreeNode<T> findLeafNode(T data) {
         int resultLeft;
@@ -265,7 +262,6 @@ public class TwoThreeTree<T extends Comparable<T>> {
             return;
         }
         if (node.isLeaf()) {
-            //zatial iba 3node
             if (node.getRightData() != null) {
                 if (node.getLeftData().compareTo(data) == 0) {
                     node.setLeftData(node.getRightData());
@@ -321,7 +317,7 @@ public class TwoThreeTree<T extends Comparable<T>> {
 
         int branch = 0;
 
-        while (node!= null) {
+        while (node != null) {
             if (node.getParent() != null) {
                 if (node == node.getParent().getLeftSon()) {
                     branch = -1;
@@ -332,7 +328,6 @@ public class TwoThreeTree<T extends Comparable<T>> {
                 if (node == node.getParent().getRightSon()) {
                     branch = 1;
                 }
-                //case 1: The hole has a 2-node as a parent and a 2-node as a sibling.
                 switch (caseNumber(node, branch)) {
                     case 1:
                         node = deleteCase1(node, branch);
@@ -434,7 +429,7 @@ public class TwoThreeTree<T extends Comparable<T>> {
         return node;
     }
     private void deleteCase2(TwoThreeNode<T> node, int branch) {
-        TwoThreeNode<T> tmp = null;
+        TwoThreeNode<T> tmp;
 
         if (branch == -1) {
             tmp = node.getParent().getCenterSon();
