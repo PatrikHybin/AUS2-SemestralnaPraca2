@@ -74,6 +74,7 @@ public class AppGUI extends JFrame {
                 personFormDialog.setLocationRelativeTo(null);
                 personFormDialog.setVisible(true);
                 table.setModel(program.getPersonsTable());
+
                 /* cez list
                 DefaultListModel listModel = new DefaultListModel();
                 for (PCRTestTEST test : program.tree.inOrder()) {

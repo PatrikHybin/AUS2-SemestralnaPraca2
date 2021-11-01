@@ -21,10 +21,7 @@ public class Program {
     private String[] pcrTestColumnNames = {"Test code","Day and time","Result","Patient","Workplace code","District code","Region Code","Note"};
     private String[] personColumnNames = {"Name","Surname","Identification number","Birthday"};
 
-    private TwoThreeTree<PCRTestTEST> tree = new TwoThreeTree<>();
-
     public Program() {
-
 
         for (Region region : generator.getRegions()){
             regionTree.insert(region);
@@ -36,56 +33,6 @@ public class Program {
             workplaceTree.insert(workplace);
         }
 
-        /*for (:){
-
-        }*/
-
-        /*Random r = new Random();
-        //r.setSeed(100);
-        //r.nextInt() % (100 - 1) + 1
-        PCRTestTEST z = new PCRTestTEST(62);
-        PCRTestTEST y = new PCRTestTEST(63);
-        PCRTestTEST x = new PCRTestTEST(0);
-        PCRTestTEST a = new PCRTestTEST(10);
-        PCRTestTEST b = new PCRTestTEST(20);
-        PCRTestTEST l = new PCRTestTEST(22);
-        PCRTestTEST k = new PCRTestTEST(25);
-        PCRTestTEST c = new PCRTestTEST(30);
-        PCRTestTEST d = new PCRTestTEST(40);
-        PCRTestTEST e = new PCRTestTEST(50);
-        PCRTestTEST f = new PCRTestTEST(60);
-        PCRTestTEST aa = new PCRTestTEST(61);
-        PCRTestTEST aaa = new PCRTestTEST(62);
-        PCRTestTEST aaaa = new PCRTestTEST(63);
-        PCRTestTEST aaaaa = new PCRTestTEST(64);
-        PCRTestTEST g = new PCRTestTEST(70);
-        PCRTestTEST h = new PCRTestTEST(80);
-        PCRTestTEST i = new PCRTestTEST(90);
-        PCRTestTEST j = new PCRTestTEST(100);
-
-        tree.insert(x);
-        tree.insert(a);
-        tree.insert(b);
-        tree.insert(c);
-        tree.insert(d);
-        tree.insert(e);
-        tree.insert(f);
-        tree.insert(g);
-        tree.insert(h);
-        tree.insert(i);
-        tree.insert(j);
-        tree.insert(k);
-        tree.insert(l);
-        tree.insert(aa);
-        tree.insert(aaa);
-        tree.insert(aaaa);
-        tree.insert(aaaaa);
-
-        for (PCRTestTEST test: tree.getInterval(z, y)) {
-            System.out.printf(test.getTestCode() + " ");
-        }*/
-
-        //T00:00
     }
 
     public void addPerson(String[] inputs) {
@@ -96,17 +43,9 @@ public class Program {
         }
     }
 
-    /*inputs[0] = getDateAndTimeOfTestInput();
-        inputs[1] = getTestResultInput();
-        inputs[2] = getIdNumberOfPatientInput();
-        inputs[3] = getWorkplaceCodeInput();
-        inputs[4] = getDistrictCodeInput();
-        inputs[5] = getRegionCodeInput();
-        inputs[6] = getNoteInput();*/
     public void addPCRTest(String[] inputs) {
         Person person = personTree.find(new Person(inputs[2]));
         int regionCode = Integer.parseInt(inputs[5].split("[.]")[0]);
-        //UUID testCode, LocalDateTime dateAndTimeOfTest, String result , Person patient, int workplaceCode, int districtCode, int regionCode, String note
         PCRTestData pcrTest = new PCRTestData(UUID.randomUUID(), LocalDateTime.parse(inputs[0]), inputs[1], person, Integer.parseInt(inputs[3]), Integer.parseInt(inputs[4]), regionCode, inputs[6]);
 
         pcrTestUUIDTree.insert(new PCRTestUUID(pcrTest));
@@ -152,15 +91,6 @@ public class Program {
         }
     }
 
-    /*inputs[0] = getSearchTestResultInput();
-        inputs[1] = getTestCodeInput();
-        inputs[2] = getPersonIdInput();
-        inputs[3] = getRegionCodeInput();
-        inputs[4] = getDistrictCodeInput();
-        inputs[5] = getWorkplaceCodeInput();
-        inputs[6] = getMinDateInput();
-        inputs[7] = getMaxDateInput();
-        inputs[8] = getIllTimeInput();*/
     private void searchPCRTestCode(String[] inputs) {
         ArrayList<PCRTestUUID> tests = new ArrayList<>();
         tests.add(pcrTestUUIDTree.find(new PCRTestUUID(new PCRTestData(UUID.fromString(inputs[1])))));
@@ -191,29 +121,11 @@ public class Program {
         }
         searchTableModel = new DefaultTableModel(getPCRTestDateDataToTable(tests), pcrTestColumnNames);
     }
-    /*inputs[0] = getSearchTestResultInput();
-        inputs[1] = getTestCodeInput();
-        inputs[2] = getPersonIdInput();
-        inputs[3] = getRegionCodeInput();
-        inputs[4] = getDistrictCodeInput();
-        inputs[5] = getWorkplaceCodeInput();
-        inputs[6] = getMinDateInput() + "T00:00";
-        inputs[7] = getMaxDateInput() + "T23:59";
-        inputs[8] = getIllTimeInput();*/
+
     private void searchPCRTestMinMaxDateAndWorkplaceCode(String[] inputs) {
-        System.out.println(inputs[0] + "0");
-        System.out.println(inputs[1] + "1");
-        System.out.println(inputs[2] + "2");
-        System.out.println(inputs[3] + "3");
-        System.out.println(inputs[4] + "4");
-        System.out.println(inputs[5] + "5");
-        System.out.println(inputs[6] + "6");
-        System.out.println(inputs[7] + "7");
         ArrayList<PCRTestDate> tests = new ArrayList<>();
         Workplace workplace = workplaceTree.find(new Workplace(Integer.parseInt(inputs[5])));
         tests.addAll(workplace.getPcrTestDateTree().getInterval(new PCRTestDate(new PCRTestData(LocalDateTime.parse(inputs[6]))), new PCRTestDate(new PCRTestData(LocalDateTime.parse(inputs[7])))));
-        //System.out.println(tests.size());
-        //System.out.println(workplace.getPcrTestTree().getInterval(new PCRTestDate(new PCRTestData(LocalDateTime.parse(inputs[6]))), new PCRTestDate(new PCRTestData(LocalDateTime.parse(inputs[7])))).size());
         searchTableModel = new DefaultTableModel(getPCRTestDateDataToTable(tests), pcrTestColumnNames);
     }
 
@@ -255,9 +167,7 @@ public class Program {
             data[i][6] = pcrTestData.getRegionCode();
             data[i][7] = pcrTestData.getNote();
         }
-
         return new DefaultTableModel(data, pcrTestColumnNames);
-
     }
 
     public DefaultTableModel getPersonsTable() {

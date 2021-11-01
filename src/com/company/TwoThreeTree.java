@@ -22,7 +22,6 @@ public class TwoThreeTree<T extends Comparable<T>> {
         }
 
         TwoThreeNode<T> node;
-        //TODO:(one find)
         if (find(data) == null) {
             node = findLeafNode(data);
             ArrayList<T> dataList;
