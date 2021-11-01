@@ -11,6 +11,15 @@ public class Person implements Comparable<Person> {
     private String surname;
     private String idNumber;
     private LocalDate dateOfBirth;
+    private TwoThreeTree<PCRTestDate> pcrTestDateTree = new TwoThreeTree<>();
+    private TwoThreeTree<PCRTestUUID> pcrTestUUIDTree = new TwoThreeTree<>();
+
+    public Person(String name, String surname, String idNumber, LocalDate dateOfBirth) {
+        this.name = name;
+        this.surname = surname;
+        this.idNumber = idNumber;
+        this.dateOfBirth = dateOfBirth;
+    }
 
     public Person(String idNumber) {
         this.idNumber = idNumber;
@@ -61,4 +70,19 @@ public class Person implements Comparable<Person> {
         this.dateOfBirth = dateOfBirth;
     }
 
+    public TwoThreeTree<PCRTestDate> getPcrTestDateTree() {
+        return pcrTestDateTree;
+    }
+
+    public boolean insertPCRTestDate(PCRTestDate pcrTestDate) {
+        return pcrTestDateTree.insert(pcrTestDate);
+    }
+
+    public TwoThreeTree<PCRTestUUID> getPcrTestUUIDTree() {
+        return pcrTestUUIDTree;
+    }
+
+    public boolean insertPCRTestUUID(PCRTestUUID pcrTestUUID) {
+        return pcrTestUUIDTree.insert(pcrTestUUID);
+    }
 }

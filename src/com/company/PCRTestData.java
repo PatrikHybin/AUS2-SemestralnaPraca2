@@ -4,31 +4,33 @@ import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
 
-public class PCRTest implements Comparable<PCRTest> {
-    private LocalDateTime dateAndTimeOfTest;
-    private Person patient;
-    private UUID testCode;
-    private int workplaceCode;
-    private int districtCode;
-    private int regionCode;
-    private boolean result;
-    private String note;
+public class PCRTestData {
+    protected LocalDateTime dateAndTimeOfTest;
+    protected Person patient;
+    protected UUID testCode;
+    protected int workplaceCode;
+    protected int districtCode;
+    protected int regionCode;
+    protected String result;
+    protected String note;
 
-    public PCRTest(UUID testCode) {
+    public PCRTestData(UUID testCode) {
         this.testCode = testCode;
     }
 
-    @Override
-    public int compareTo(PCRTest pcrTest) {
-        if (this.testCode.compareTo(pcrTest.testCode) == 0) {
-            return 0;
-        } else {
-            if (this.testCode.compareTo(pcrTest.testCode) < 0) {
-                return -1;
-            } else {
-                return 1;
-            }
-        }
+    public PCRTestData(UUID testCode, LocalDateTime dateAndTimeOfTest, String result , Person patient, int workplaceCode, int districtCode, int regionCode, String note) {
+        this.dateAndTimeOfTest = dateAndTimeOfTest;
+        this.patient = patient;
+        this.testCode = testCode;
+        this.workplaceCode = workplaceCode;
+        this.districtCode = districtCode;
+        this.regionCode = regionCode;
+        this.result = result;
+        this.note = note;
+    }
+
+    public PCRTestData(LocalDateTime date) {
+        this.dateAndTimeOfTest = date;
     }
 
     public LocalDateTime getDateAndTimeOfTest() {
@@ -79,11 +81,11 @@ public class PCRTest implements Comparable<PCRTest> {
         this.regionCode = regionCode;
     }
 
-    public boolean isResult() {
+    public String getResult() {
         return result;
     }
 
-    public void setResult(boolean result) {
+    public void setResult(String result) {
         this.result = result;
     }
 

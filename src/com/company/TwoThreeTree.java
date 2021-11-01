@@ -9,20 +9,20 @@ public class TwoThreeTree<T extends Comparable<T>> {
     public TwoThreeTree() {
         root = null;
     }
-
-    public void insert(T data) {
-
+    //Implementovane podla prednasky
+    public boolean insert(T data) {
         if (root == null) {
             root = new TwoThreeNode<>(data);
-            return;
+            return true;
         }
 
         if (root.getLeftData() == null && root.getRightData() == null) {
             root.setLeftData(data);
-            return;
+            return true;
         }
 
         TwoThreeNode<T> node;
+        //TODO:(one find)
         if (find(data) == null) {
             node = findLeafNode(data);
             ArrayList<T> dataList;
@@ -57,7 +57,7 @@ public class TwoThreeTree<T extends Comparable<T>> {
                         root = pushedNode;
                         pushedNode.getLeftSon().setParent(pushedNode);
                         pushedNode.getCenterSon().setParent(pushedNode);
-                        return;
+                        return true;
 
                     } else {
                         if (node.getParent().getRightData() == null) {
@@ -90,7 +90,7 @@ public class TwoThreeTree<T extends Comparable<T>> {
                             node.getCenterSon().setParent(node);
 
                             CorrectLeftAndRightData(node);
-                            return;
+                            return true;
                         } //parent 3node
                         else {
                             if (node == node.getParent().getLeftSon()) {
@@ -108,6 +108,7 @@ public class TwoThreeTree<T extends Comparable<T>> {
                 }
             }
         }
+        return false;
     }
 
     private void Split(TwoThreeNode<T> node, T leftData, T rightData) {
@@ -123,6 +124,7 @@ public class TwoThreeTree<T extends Comparable<T>> {
         node.setLeftSon(leftNode);
         node.setCenterSon(centerNode);
     }
+
     private TwoThreeNode<T> Split(TwoThreeNode<T> node, TwoThreeNode<T> pushedNode, int branch) {
         ArrayList<T> dataList = new ArrayList<>(Arrays.asList(node.getLeftData(), node.getRightData(), pushedNode.getLeftData()));
         Collections.sort(dataList);
@@ -193,7 +195,7 @@ public class TwoThreeTree<T extends Comparable<T>> {
         int resultRight;
         TwoThreeNode<T> node = root;
         while (!node.isLeaf()) {
-            resultRight = 10;
+            resultRight = 100;
             resultLeft = data.compareTo(node.getLeftData());
             if (node.getRightData() != null) {
                 resultRight = data.compareTo(node.getRightData());
@@ -209,7 +211,7 @@ public class TwoThreeTree<T extends Comparable<T>> {
         return node;
     }
 
-
+    //Implementovane podla prednasky
     public T find(T data) {
         TwoThreeNode<T> node;
         node = findNode(data);
@@ -223,7 +225,6 @@ public class TwoThreeTree<T extends Comparable<T>> {
             }
         }
         return returnData;
-
     }
     
     private TwoThreeNode<T> findNode(T data) {
@@ -231,14 +232,13 @@ public class TwoThreeTree<T extends Comparable<T>> {
             return null;
         } else {
             int resultLeft;
-            int resultRight = 10;
+            int resultRight = 100;
             TwoThreeNode<T> node = root;
             while (node != null) {
                 resultLeft = data.compareTo(node.getLeftData());
                 if (node.getRightData() != null) {
                     resultRight = data.compareTo(node.getRightData());
                 }
-
                 if (resultLeft == 0 || resultRight == 0) {
                     return node;
                 } else {
@@ -254,7 +254,7 @@ public class TwoThreeTree<T extends Comparable<T>> {
         }
         return null;
     }
-
+    //Implementovane pomocou clanku z https://www.cs.princeton.edu/~dpw/courses/cos326-12/ass/2-3-trees.pdf?fbclid=IwAR3SMu7v3IbeMZx0d0tDSglu7Kn4kggtdQixRNW29PemWOi3tJXITn-iH_I
     public void delete(T data) {
         TwoThreeNode<T> node = findNode(data);
         TwoThreeNode<T> predecessor = inOrderPredecessor(node, data);
@@ -428,6 +428,7 @@ public class TwoThreeTree<T extends Comparable<T>> {
         node.setCenterSon(null);
         return node;
     }
+
     private void deleteCase2(TwoThreeNode<T> node, int branch) {
         TwoThreeNode<T> tmp;
 
@@ -648,9 +649,7 @@ public class TwoThreeTree<T extends Comparable<T>> {
                             }
                         }
                     }
-
                     nodeStack.pop();
-
                     if (nodeStack.size() != 0) {
                         node = nodeStack.peek();
                     }
@@ -677,6 +676,151 @@ public class TwoThreeTree<T extends Comparable<T>> {
                     node = node.getCenterSon();
                 }
             }
+        }
+        return node;
+    }
+
+    public ArrayList<T> getInterval(T minData, T maxData) {
+        TwoThreeNode<T> node = findIntervalMinNode(minData);
+        if (node == null) {
+            System.out.println("node is null in getInterval");
+        }
+        return inOrderIntervalMinMax(node, minData, maxData);
+    }
+
+    private TwoThreeNode<T> findIntervalMinNode(T minData) {
+        if (root == null) {
+            return null;
+        } else {
+            int resultLeft;
+            int resultRight = 100;
+            TwoThreeNode<T> node = root;
+            TwoThreeNode<T> tmp = root;
+            while (node != null) {
+                resultLeft = minData.compareTo(node.getLeftData());
+                if (node.getRightData() != null) {
+                    resultRight = minData.compareTo(node.getRightData());
+                }
+                tmp = node;
+                if (resultLeft == 0 || resultRight == 0) {
+                    return node;
+                } else {
+                    if (resultLeft < 0) {
+                        node = node.getLeftSon();
+                    } else if (node.getRightData() == null || resultRight < 0) {
+                        node = node.getCenterSon();
+                    } else {
+                        node = node.getRightSon();
+                    }
+                }
+            }
+
+            if (tmp.getRightData() != null) {
+                if (tmp.getRightData().compareTo(minData) < 0) {
+                    tmp = tmp.getParent();
+                }
+            } else {
+                if (tmp.getLeftData().compareTo(minData) < 0) {
+                    tmp = tmp.getParent();
+                }
+            }
+            return tmp;
+        }
+    }
+
+    private ArrayList<T> inOrderIntervalMinMax(TwoThreeNode<T> minNode, T minData, T maxData) {
+        ArrayList<T> list = new ArrayList<>();
+        TwoThreeNode<T> node;
+
+        T current = minData;
+        node = minNode;
+
+        while (node != null) {
+            if (node.isLeaf()) {
+                if (node.getRightData() != null) {
+                    if (node.getLeftData().compareTo(current) > -1) {
+                        if (node.getLeftData().compareTo(maxData) > 0) {
+                            break;
+                        }
+                        list.add(node.getLeftData());
+                    }
+                    if (node.getRightData().compareTo(maxData) > 0) {
+                        break;
+                    }
+                    list.add(node.getRightData());
+                    current = node.getRightData();
+                } else {
+                    if (node.getLeftData().compareTo(maxData) > 0) {
+                        break;
+                    }
+                    list.add(node.getLeftData());
+                    current = node.getLeftData();
+                }
+                node = inOrderSuccessor(node, current);
+            } else {
+                if (node.getRightData() != null) {
+                    if (node.getLeftData().compareTo(current) > -1) {
+                        if (node.getLeftData().compareTo(maxData) > 0) {
+                            break;
+                        }
+                        list.add(node.getLeftData());
+                        current = node.getLeftData();
+                    } else {
+                        if (node.getRightData().compareTo(maxData) > 0) {
+                            break;
+                        }
+                        list.add(node.getRightData());
+                        current = node.getRightData();
+                    }
+                } else {
+                    if (node.getLeftData().compareTo(maxData) > 0) {
+                        break;
+                    }
+                    list.add(node.getLeftData());
+                    current = node.getLeftData();
+                }
+                node = inOrderSuccessor(node, current);
+            }
+        }
+        return list;
+    }
+
+    private TwoThreeNode<T> inOrderSuccessor(TwoThreeNode<T> node, T data) {
+        boolean down = false;
+        if (!node.isLeaf()) {
+            down = true;
+            if (node.getLeftData().compareTo(data) == 0) {
+                node = node.getCenterSon();
+            }
+            if (node.getRightData() != null && node.getRightData().compareTo(data) == 0) {
+                node = node.getRightSon();
+            }
+        }
+        while (node != null) {
+            if (down) {
+                if (node.isLeaf()) {
+                    break;
+                }
+                node = node.getLeftSon();
+                continue;
+            }
+            if (node.getParent() != null) {
+                //2 node
+                if (node.getParent().getRightData() == null) {
+                    if (node.getParent().getLeftSon() == node) {
+                        return node.getParent();
+                    }
+                } //3 node
+                else {
+                    if (node.getParent().getLeftSon() == node) {
+                        return node.getParent();
+                    }
+                    if (node.getParent().getCenterSon() == node) {
+                        return node.getParent();
+                    }
+                }
+            }
+            node = node.getParent();
         }
         return node;
     }
