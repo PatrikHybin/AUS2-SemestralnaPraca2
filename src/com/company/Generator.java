@@ -81,6 +81,7 @@ public class Generator {
         int maxDays = 55*365;
         LocalDate birthday;
         //r.nextInt() % (100 - 1) + 1
+
         for (int i = 0; i < generateNum; i++) {
             name = names[r.nextInt(names.length)];
             surname = names[r.nextInt(names.length)];
@@ -91,7 +92,6 @@ public class Generator {
             persons.add(person);
             tmp.add(person);
         }
-
         return tmp;
     }
 

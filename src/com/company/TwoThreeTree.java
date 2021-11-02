@@ -29,6 +29,7 @@ public class TwoThreeTree<T extends Comparable<T>> {
             if (node.getRightData() == null) {
                 node.setRightData(data);
                 CorrectLeftAndRightData(node);
+                return true;
             }
             //leaf is 3node
             else {
@@ -50,7 +51,6 @@ public class TwoThreeTree<T extends Comparable<T>> {
                     } else {
                         pushedNode = Split(node, pushedNode, branch);
                     }
-
 
                     if (node == root) {
                         root = pushedNode;

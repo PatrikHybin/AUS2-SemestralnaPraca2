@@ -3,6 +3,7 @@ package com.company;
 import javax.swing.table.DefaultTableModel;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class Program {
@@ -139,7 +140,7 @@ public class Program {
             data[i][1] = pcrTestData.getDateAndTimeOfTest();
             data[i][2] = pcrTestData.getResult();
             person = pcrTestData.getPatient();
-            data[i][3] = person.getName() + " " + person.getSurname();
+            data[i][3] = person.getName() + " " + person.getSurname() + " " + person.getIdNumber() + " " + person.getDateOfBirth().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
             data[i][4] = pcrTestData.getWorkplaceCode();
             data[i][5] = pcrTestData.getDistrictCode();
             data[i][6] = pcrTestData.getRegionCode();
@@ -161,7 +162,7 @@ public class Program {
             data[i][1] = pcrTestData.getDateAndTimeOfTest();
             data[i][2] = pcrTestData.getResult();
             person = pcrTestData.getPatient();
-            data[i][3] = person.getName() + " " + person.getSurname();
+            data[i][3] = person.getName() + " " + person.getSurname() + " " + person.getIdNumber() + " " + person.getDateOfBirth().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
             data[i][4] = pcrTestData.getWorkplaceCode();
             data[i][5] = pcrTestData.getDistrictCode();
             data[i][6] = pcrTestData.getRegionCode();
@@ -196,6 +197,7 @@ public class Program {
             boolean outcome = personTree.insert(person);
             if (!outcome) {
                 generator.deletePersonFromList(person);
+                System.out.println("som tu");
             }
         }
     }
