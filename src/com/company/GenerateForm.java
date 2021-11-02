@@ -1,6 +1,9 @@
 package com.company;
 
+import javafx.scene.web.PromptData;
+
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.*;
 
 public class GenerateForm extends JDialog {
@@ -9,15 +12,18 @@ public class GenerateForm extends JDialog {
     private JButton buttonCancel;
     private JTextField personsNumberInput;
     private JTextField testNumberInput;
+    private JLabel zeroPersons;
 
-    public GenerateForm() {
+    public GenerateForm(Program program) {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
-
+        Dimension dim = new Dimension();
+        dim.setSize(400, 155);
+        setMinimumSize(dim);
         buttonOK.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                onOK();
+                onOK(program);
             }
         });
 
@@ -43,8 +49,17 @@ public class GenerateForm extends JDialog {
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 
-    private void onOK() {
-        dispose();
+    private void onOK(Program program) {
+        program.generatePersons(getPersonsNumberInput());
+        if (program.getNumberOfPersonsInSystem() == 0) {
+            zeroPersons.setText("To generate PCRTests you need at least one person!");
+            zeroPersons.setForeground(Color.red);
+        } else {
+            zeroPersons.setText("");
+            zeroPersons.setForeground(Color.black);
+            program.generatePCRTest(getTestNumberInput());
+            dispose();
+        }
     }
 
     private void onCancel() {

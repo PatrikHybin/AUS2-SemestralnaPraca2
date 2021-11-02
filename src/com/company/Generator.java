@@ -166,6 +166,10 @@ public class Generator {
         persons.add(person);
     }
 
+    public int getPersonsSize() {
+        return persons.size();
+    }
+
     public void deletePCRTestDataFromList(PCRTestData pcrTestData) {
         pcrTestsData.remove(pcrTestData);
     }

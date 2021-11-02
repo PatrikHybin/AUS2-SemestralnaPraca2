@@ -39,9 +39,13 @@ public class Program {
     public void addPerson(String[] inputs) {
         Person person = new Person(inputs[0], inputs[1], inputs[2], LocalDate.parse(inputs[3]));
         boolean outcome = personTree.insert(person);
-        if (outcome) {
+        if (!outcome) {
             generator.addPersonToList(person);
         }
+    }
+
+    public int getNumberOfPersonsInSystem() {
+        return generator.getPersonsSize();
     }
 
     public void addPCRTest(String[] inputs) {
@@ -50,6 +54,7 @@ public class Program {
         PCRTestData pcrTest = new PCRTestData(UUID.randomUUID(), LocalDateTime.parse(inputs[0]), inputs[1], person, Integer.parseInt(inputs[3]), Integer.parseInt(inputs[4]), regionCode, inputs[6]);
 
         pcrTestUUIDTree.insert(new PCRTestUUID(pcrTest));
+
         Workplace workplace = workplaceTree.find(new Workplace(Integer.parseInt(inputs[3])));
         workplace.insertPCRTestDate(new PCRTestDate(pcrTest));
     }

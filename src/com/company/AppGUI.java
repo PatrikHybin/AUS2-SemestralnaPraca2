@@ -36,18 +36,10 @@ public class AppGUI extends JFrame {
         setTitle("Hello!");
         setSize(1024, 512);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-
         /*Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(dim.width/2 - this.getSize().width/2, dim.height/2 - this.getSize().height/2);*/
         setLocationRelativeTo(null);
         setVisible(true);
-        /*
-        tableModel.addColumn(columnNames[0]);
-        tableModel.addColumn(columnNames[1]);
-        tableModel.addColumn(columnNames[2]);
-        tableModel.addColumn(columnNames[3]);
-        tableModel.addColumn(columnNames[4]);
-        */
 
         table.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         table.setDefaultEditor(Object.class, null);
@@ -116,13 +108,11 @@ public class AppGUI extends JFrame {
         generateButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                GenerateForm generateFormDialog = new GenerateForm();
+                GenerateForm generateFormDialog = new GenerateForm(program);
                 generateFormDialog.setTitle("Generate Form");
                 generateFormDialog.pack();
                 generateFormDialog.setLocationRelativeTo(null);
                 generateFormDialog.setVisible(true);
-                program.generatePersons(generateFormDialog.getPersonsNumberInput());
-                program.generatePCRTest(generateFormDialog.getTestNumberInput());
 
             }
         });
