@@ -3,6 +3,7 @@ package com.company;
 import com.github.lgooddatepicker.components.DateTimePicker;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.*;
 
 public class PCRTestForm extends JDialog {
@@ -20,8 +21,6 @@ public class PCRTestForm extends JDialog {
     private JLabel testResult;
     private JLabel idNumberOfPatient;
     private JLabel workplaceCode;
-    private JLabel districtCode;
-    private JLabel regionCode;
     private JLabel note;
     private String[] inputs = {null,null,null,null,null,null,null};
 
@@ -64,14 +63,29 @@ public class PCRTestForm extends JDialog {
         inputs[1] = getTestResultInput();
         inputs[2] = getIdNumberOfPatientInput();
         inputs[3] = getWorkplaceCodeInput();
-        inputs[4] = getDistrictCodeInput();
-        inputs[5] = getRegionCodeInput();
-        inputs[6] = getNoteInput();
+        inputs[4] = getNoteInput();
 
-        if (!inputs[0].equals("")) {
-            program.addPCRTest(inputs);
-            dispose();
+        if (inputs[1].equals("-- Select --")) {
+            testResult.setText("You need to choose result of the test!");
+            testResult.setForeground(Color.red);
+        } else {
+            testResult.setText("Test result");
+            testResult.setForeground(Color.black);
+
+            if (program.checkIfPersonExists(inputs[2])) {
+                idNumberOfPatientInput.setText("ID number of patient");
+                idNumberOfPatientInput.setForeground(Color.black);
+
+                if (!inputs[0].equals("")) {
+                    program.addPCRTest(inputs);
+                    dispose();
+                }
+            } else {
+                idNumberOfPatientInput.setText("Person with that id doesnt exists");
+                idNumberOfPatientInput.setForeground(Color.red);
+            }
         }
+
     }
 
     private void onCancel() {
@@ -93,14 +107,6 @@ public class PCRTestForm extends JDialog {
 
     public String getWorkplaceCodeInput() {
         return workplaceCodeInput.getText();
-    }
-
-    public String getDistrictCodeInput() {
-        return districtCodeInput.getText();
-    }
-
-    public String getRegionCodeInput() {
-        return String.valueOf(regionCodeInput.getSelectedItem());
     }
 
     public String getNoteInput() {

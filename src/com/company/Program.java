@@ -38,8 +38,8 @@ public class Program {
 
     public void addPerson(String[] inputs) {
         Person person = new Person(inputs[0], inputs[1], inputs[2], LocalDate.parse(inputs[3]));
-        boolean outcome = personTree.insert(person);
-        if (!outcome) {
+        boolean insert = personTree.insert(person);
+        if (insert) {
             generator.addPersonToList(person);
         }
     }
@@ -49,13 +49,13 @@ public class Program {
     }
 
     public void addPCRTest(String[] inputs) {
+        Workplace workplace = workplaceTree.find(new Workplace(Integer.parseInt(inputs[3])));
         Person person = personTree.find(new Person(inputs[2]));
-        int regionCode = Integer.parseInt(inputs[5].split("[.]")[0]);
-        PCRTestData pcrTest = new PCRTestData(UUID.randomUUID(), LocalDateTime.parse(inputs[0]), inputs[1], person, Integer.parseInt(inputs[3]), Integer.parseInt(inputs[4]), regionCode, inputs[6]);
+
+        PCRTestData pcrTest = new PCRTestData(UUID.randomUUID(), LocalDateTime.parse(inputs[0]), inputs[1], person, workplace.getWorkplaceCode(), workplace.getDistrict().getDistrictCode(), workplace.getDistrict().getRegion().getRegionCode(), inputs[4]);
 
         pcrTestUUIDTree.insert(new PCRTestUUID(pcrTest));
 
-        Workplace workplace = workplaceTree.find(new Workplace(Integer.parseInt(inputs[3])));
         workplace.insertPCRTestDate(new PCRTestDate(pcrTest));
     }
 
@@ -145,7 +145,11 @@ public class Program {
             data[i][1] = pcrTestData.getDateAndTimeOfTest();
             data[i][2] = pcrTestData.getResult();
             person = pcrTestData.getPatient();
-            data[i][3] = person.getName() + " " + person.getSurname() + " " + person.getIdNumber() + " " + person.getDateOfBirth().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+            if (person != null) {
+                data[i][3] = person.getName() + " " + person.getSurname() + " " + person.getIdNumber() + " " + person.getDateOfBirth().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+            } else {
+                System.out.println("Person null big ERROR");
+            }
             data[i][4] = pcrTestData.getWorkplaceCode();
             data[i][5] = pcrTestData.getDistrictCode();
             data[i][6] = pcrTestData.getRegionCode();
@@ -167,7 +171,11 @@ public class Program {
             data[i][1] = pcrTestData.getDateAndTimeOfTest();
             data[i][2] = pcrTestData.getResult();
             person = pcrTestData.getPatient();
-            data[i][3] = person.getName() + " " + person.getSurname() + " " + person.getIdNumber() + " " + person.getDateOfBirth().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+            if (person != null) {
+                data[i][3] = person.getName() + " " + person.getSurname() + " " + person.getIdNumber() + " " + person.getDateOfBirth().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+            } else {
+                System.out.println("Person null big ERROR");
+            }
             data[i][4] = pcrTestData.getWorkplaceCode();
             data[i][5] = pcrTestData.getDistrictCode();
             data[i][6] = pcrTestData.getRegionCode();
@@ -202,7 +210,6 @@ public class Program {
             boolean outcome = personTree.insert(person);
             if (!outcome) {
                 generator.deletePersonFromList(person);
-                System.out.println("som tu");
             }
         }
     }
@@ -226,6 +233,22 @@ public class Program {
             if (!outcome) {
                 generator.deletePCRTestDataFromList(pcrTestData);
             }
+        }
+    }
+
+    public boolean checkIfPersonExists(String input) {
+        if (personTree.find(new Person(input)) == null) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public boolean checkNumberOfPatients() {
+        if (getNumberOfPersonsInSystem() == 0) {
+            return false;
+        } else {
+            return true;
         }
     }
 }

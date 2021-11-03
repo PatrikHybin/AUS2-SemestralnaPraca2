@@ -6,6 +6,7 @@ public class District implements Comparable<District> {
     private Integer districtCode;
     private TwoThreeTree<Workplace> workplaceTree = new TwoThreeTree<>();
     private ArrayList<Workplace> workplaces = new ArrayList<>();
+    private Region region;
 
     District(int districtCode) {
         this.districtCode = districtCode;
@@ -38,5 +39,13 @@ public class District implements Comparable<District> {
 
     public ArrayList<Workplace> getWorkplaces() {
         return workplaces;
+    }
+
+    public Region getRegion() {
+        return region;
+    }
+
+    public void setRegion(Region region) {
+        this.region = region;
     }
 }

@@ -44,23 +44,29 @@ public class Generator {
     }
 
     private void generateDistricts() {
+        int tmp;
         for (int i = 0; i < regions.size(); i++) {
-            for (int j = 0; j < 50; j++) {
-                District district = new District((i+1) * (j+1));
+            for (int j = 0; j < 9; j++) {
+                tmp = j + 1;
+                District district = new District(Integer.parseInt(regions.get(i).getRegionCode() + "" + tmp));
                 districts.add(district);
                 regions.get(i).insertDistrict(district);
                 regions.get(i).getDistricts().add(district);
+                district.setRegion(regions.get(i));
             }
         }
     }
 
     private void generateWorkplaces() {
+        int tmp;
         for (int i = 0; i < districts.size(); i++) {
             for (int j = 0; j < 3; j++) {
-                Workplace workplace = new Workplace((i+1) * (j+1));
+                tmp = j + 1;
+                Workplace workplace = new Workplace(Integer.parseInt(districts.get(i).getDistrictCode() + "" + tmp));
                 workplaces.add(workplace);
                 districts.get(i).insertWorkplace(workplace);
                 districts.get(i).getWorkplaces().add(workplace);
+                workplace.setDistrict(districts.get(i));
             }
         }
     }
@@ -87,7 +93,7 @@ public class Generator {
             surname = names[r.nextInt(names.length)];
             randomDays = (int)(maxDays*Math.random());
             birthday = baseDate.plusDays(randomDays);
-            String idNumber = DateTimeFormatter.ofPattern("yyMMdd").format(birthday);
+            String idNumber = DateTimeFormatter.ofPattern("yyMMdd").format(birthday) + "/" + UUID.randomUUID().toString().substring(0,4);
             Person person = new Person(name, surname, idNumber ,birthday);
             persons.add(person);
             tmp.add(person);

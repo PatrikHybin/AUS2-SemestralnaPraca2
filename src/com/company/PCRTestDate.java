@@ -10,7 +10,15 @@ public class PCRTestDate implements Comparable<PCRTestDate> {
     @Override
     public int compareTo(PCRTestDate pcrTest) {
         if (this.pcrTestData.dateAndTimeOfTest.compareTo(pcrTest.pcrTestData.dateAndTimeOfTest) == 0) {
-            return 0;
+            if (this.pcrTestData.testCode.compareTo(pcrTest.pcrTestData.testCode) == 0) {
+                return 0;
+            } else {
+                if (this.pcrTestData.testCode.compareTo(pcrTest.pcrTestData.testCode) < 0) {
+                    return -1;
+                } else {
+                    return 1;
+                }
+            }
         } else {
             if (this.pcrTestData.dateAndTimeOfTest.compareTo(pcrTest.pcrTestData.dateAndTimeOfTest) < 0) {
                 return -1;

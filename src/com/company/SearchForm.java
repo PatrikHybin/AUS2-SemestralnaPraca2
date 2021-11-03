@@ -126,9 +126,9 @@ public class SearchForm extends JDialog {
         for (JCheckBox checkBox: checkBoxes){
             if (checkBox.isSelected()) {
                 program.search(checkBox.getText(), inputs);
+                dispose();
             }
         }
-        dispose();
     }
 
     private void onCancel() {

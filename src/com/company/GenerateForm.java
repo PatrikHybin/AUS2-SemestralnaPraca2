@@ -51,7 +51,7 @@ public class GenerateForm extends JDialog {
 
     private void onOK(Program program) {
         program.generatePersons(getPersonsNumberInput());
-        if (program.getNumberOfPersonsInSystem() == 0) {
+        if (!program.checkNumberOfPatients()) {
             zeroPersons.setText("To generate PCRTests you need at least one person!");
             zeroPersons.setForeground(Color.red);
         } else {

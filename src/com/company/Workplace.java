@@ -4,6 +4,7 @@ public class Workplace implements Comparable<Workplace> {
     private Integer workplaceCode;
     private TwoThreeTree<PCRTestDate> pcrTestDateTree = new TwoThreeTree<>();
     private TwoThreeTree<PCRTestDate> prcTestDatePositiveTree = new TwoThreeTree<>();
+    private District district;
 
     Workplace(int workplaceCode) {
         this.workplaceCode = workplaceCode;
@@ -43,4 +44,11 @@ public class Workplace implements Comparable<Workplace> {
         }
     }
 
+    public District getDistrict() {
+        return district;
+    }
+
+    public void setDistrict(District district) {
+        this.district = district;
+    }
 }

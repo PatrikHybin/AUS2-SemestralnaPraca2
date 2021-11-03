@@ -589,6 +589,8 @@ public class TwoThreeTree<T extends Comparable<T>> {
             return list;
         }
         TwoThreeNode<T> node = root;
+        int tmpCompare = -1;
+        int level = 0;
         Stack<TwoThreeNode<T>> leftNode = new Stack<>();
         Stack<TwoThreeNode<T>> centerNode = new Stack<>();
         Stack<TwoThreeNode<T>> rightNode = new Stack<>();
@@ -601,16 +603,26 @@ public class TwoThreeTree<T extends Comparable<T>> {
                 nodeStack.push(node);
             }
             if (node.getLeftSon() != null && (leftNode.isEmpty() || node.getLeftSon() != leftNode.peek())) {
+                level++;
                 node = node.getLeftSon();
             } else if (node.getCenterSon() != null && (centerNode.isEmpty() || node.getCenterSon() != centerNode.peek())) {
+                level++;
                 list.add(node.getLeftData());
                 node = node.getCenterSon();
             } else if (node.getRightData() != null && node.getRightSon() != null && (rightNode.isEmpty() || node.getRightSon() != rightNode.peek())) {
+                level++;
                 list.add(node.getRightData());
                 node = node.getRightSon();
             } else {
                 if (node.getLeftSon() == null || (leftNode.isEmpty() || node.getLeftSon() == leftNode.peek()) && node.getCenterSon() == null || (centerNode.isEmpty() || node.getCenterSon() == centerNode.peek()) && node.getRightSon() == null || node.getRightSon() != null && (rightNode.isEmpty() || node.getRightSon() == rightNode.peek())) {
                     if (node.isLeaf()) {
+                        if (tmpCompare == -1) {
+                            tmpCompare = level;
+                        } else {
+                            if (tmpCompare != level) {
+                                System.out.println("ERROR");
+                            }
+                        }
                         list.add(node.getLeftData());
                         if (node.getRightData() != null) {
                             list.add(node.getRightData());
@@ -650,6 +662,7 @@ public class TwoThreeTree<T extends Comparable<T>> {
                     }
                     nodeStack.pop();
                     if (nodeStack.size() != 0) {
+                        level--;
                         node = nodeStack.peek();
                     }
                 }
