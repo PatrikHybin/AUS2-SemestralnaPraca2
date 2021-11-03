@@ -51,9 +51,7 @@ public class Program {
     public void addPCRTest(String[] inputs) {
         Workplace workplace = workplaceTree.find(new Workplace(Integer.parseInt(inputs[3])));
         Person person = personTree.find(new Person(inputs[2]));
-
         PCRTestData pcrTest = new PCRTestData(UUID.randomUUID(), LocalDateTime.parse(inputs[0]), inputs[1], person, workplace.getWorkplaceCode(), workplace.getDistrict().getDistrictCode(), workplace.getDistrict().getRegion().getRegionCode(), inputs[4]);
-
         pcrTestUUIDTree.insert(new PCRTestUUID(pcrTest));
 
         workplace.insertPCRTestDate(new PCRTestDate(pcrTest));
@@ -110,7 +108,11 @@ public class Program {
             data[i][1] = pcrTestData.getDateAndTimeOfTest();
             data[i][2] = pcrTestData.getResult();
             person = pcrTestData.getPatient();
-            data[i][3] = person.getName() + " " + person.getSurname();
+            if (person != null) {
+                data[i][3] = person.getName() + " " + person.getSurname() + " " + person.getIdNumber() + " " + person.getDateOfBirth().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+            } else {
+                System.out.println("Person null(2) big ERROR");
+            }
             data[i][4] = pcrTestData.getWorkplaceCode();
             data[i][5] = pcrTestData.getDistrictCode();
             data[i][6] = pcrTestData.getRegionCode();
@@ -148,7 +150,7 @@ public class Program {
             if (person != null) {
                 data[i][3] = person.getName() + " " + person.getSurname() + " " + person.getIdNumber() + " " + person.getDateOfBirth().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
             } else {
-                System.out.println("Person null big ERROR");
+                System.out.println("Person null(DateData) big ERROR");
             }
             data[i][4] = pcrTestData.getWorkplaceCode();
             data[i][5] = pcrTestData.getDistrictCode();
@@ -174,7 +176,7 @@ public class Program {
             if (person != null) {
                 data[i][3] = person.getName() + " " + person.getSurname() + " " + person.getIdNumber() + " " + person.getDateOfBirth().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
             } else {
-                System.out.println("Person null big ERROR");
+                System.out.println("Person(Tests) null big ERROR");
             }
             data[i][4] = pcrTestData.getWorkplaceCode();
             data[i][5] = pcrTestData.getDistrictCode();
