@@ -5,11 +5,17 @@ import java.util.*;
 
 public class TwoThreeTree<T extends Comparable<T>> {
     private TwoThreeNode<T> root;
+    public static final int case1 = 1;
+    public static final int case2 = 2;
+    public static final int case3a = 31;
+    public static final int case3b = 32;
+    public static final int case4a = 41;
+    public static final int case4b = 42;
 
     public TwoThreeTree() {
         root = null;
     }
-    //Implementovane podla prednasky
+    //Implementovane podla pseudokodu z http://frdsa.fri.uniza.sk/~jankovic/WEB/struktury/ADS/interaktivny_mod/ads_2_3_strom_im.html
     public boolean insert(T data) {
         if (root == null) {
             root = new TwoThreeNode<>(data);
@@ -256,10 +262,10 @@ public class TwoThreeTree<T extends Comparable<T>> {
     //Implementovane pomocou clanku z https://www.cs.princeton.edu/~dpw/courses/cos326-12/ass/2-3-trees.pdf?fbclid=IwAR3SMu7v3IbeMZx0d0tDSglu7Kn4kggtdQixRNW29PemWOi3tJXITn-iH_I
     public void delete(T data) {
         TwoThreeNode<T> node = findNode(data);
-        TwoThreeNode<T> predecessor = inOrderPredecessor(node, data);
         if (root == null || node == null) {
             return;
         }
+        TwoThreeNode<T> predecessor = inOrderPredecessor(node, data);
         if (node.isLeaf()) {
             if (node.getRightData() != null) {
                 if (node.getLeftData().compareTo(data) == 0) {
@@ -328,22 +334,22 @@ public class TwoThreeTree<T extends Comparable<T>> {
                     branch = 1;
                 }
                 switch (caseNumber(node, branch)) {
-                    case 1:
+                    case case1:
                         node = deleteCase1(node, branch);
                         break;
-                    case 2:
+                    case case2:
                         deleteCase2(node, branch);
                         return;
-                    case 31:
+                    case case3a:
                         deleteCase3a(node, branch);
                         return;
-                    case 32:
+                    case case3b:
                         deleteCase3b(node, branch);
                         return;
-                    case 41:
+                    case case4a:
                         deleteCase4a(node, branch);
                         return;
-                    case 42:
+                    case case4b:
                         deleteCase4b(node, branch);
                         return;
                     case -1:
@@ -362,34 +368,34 @@ public class TwoThreeTree<T extends Comparable<T>> {
 
     private int caseNumber(TwoThreeNode<T> node, int branch) {
         if (node.getParent().getRightData() == null && node.getParent().getCenterSon().getRightData() == null && branch == -1) {
-            return 1;
+            return case1;
         }
         if (node.getParent().getRightData() == null && node.getParent().getLeftSon().getRightData() == null && branch == 0) {
-            return 1;
+            return case1;
         }
         if (node.getParent().getRightData() == null && node.getParent().getCenterSon().getRightData() != null && branch == -1) {
-            return 2;
+            return case2;
         }
         if (node.getParent().getRightData() == null && node.getParent().getLeftSon().getRightData() != null && branch == 0) {
-            return 2;
+            return case2;
         }
         if (node.getParent().getRightData() != null && node.getParent().getCenterSon().getRightData() == null && branch == -1) {
-            return 31;
+            return case3a;
         }
         if (node.getParent().getRightData() != null && node.getParent().getLeftSon().getRightData() == null && branch == 0) {
-            return 31;
+            return case3a;
         }
         if (node.getParent().getRightData() != null && node.getParent().getCenterSon().getRightData() == null && branch == 1) {
-            return 32;
+            return case3b;
         }
         if (node.getParent().getRightData() != null && node.getParent().getCenterSon().getRightData() != null && branch == -1) {
-            return 41;
+            return case4a;
         }
         if (node.getParent().getRightData() != null && node.getParent().getLeftSon().getRightData() != null && branch == 0) {
-            return 41;
+            return case4a;
         }
         if (node.getParent().getRightData() != null && node.getParent().getCenterSon().getRightData() != null && branch == 1) {
-            return 42;
+            return case4b;
         }
         return -1;
     }
@@ -582,6 +588,7 @@ public class TwoThreeTree<T extends Comparable<T>> {
         }
     }
 
+    //Implementovane podla vlastnych materialov
     public ArrayList<T> inOrder() {
         ArrayList<T> list = new ArrayList<>();
         if (root == null || (root.getLeftData() == null && root.getRightData() == null)) {
@@ -670,7 +677,7 @@ public class TwoThreeTree<T extends Comparable<T>> {
         }
         return list;
     }
-
+    //Implementovane podla vlastnych materialov
     private TwoThreeNode<T> inOrderPredecessor(TwoThreeNode<T> node ,T data) {
         if (root == null) {
             return null;
@@ -691,7 +698,7 @@ public class TwoThreeTree<T extends Comparable<T>> {
         }
         return node;
     }
-
+    //Implementovane podla vlastnych materialov
     public ArrayList<T> getInterval(T minData, T maxData) {
         TwoThreeNode<T> node = findIntervalMinNode(minData);
         if (node == null) {

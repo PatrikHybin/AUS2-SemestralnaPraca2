@@ -24,6 +24,11 @@ public class Program {
 
     public Program() {
 
+        TwoThreeTreeTester tester = new TwoThreeTreeTester();
+        tester.testInsertDelete();
+        tester.testIntervalSearch();
+
+
         for (Region region : generator.getRegions()){
             regionTree.insert(region);
         }
