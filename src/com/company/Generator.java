@@ -179,4 +179,8 @@ public class Generator {
     public void deletePCRTestDataFromList(PCRTestData pcrTestData) {
         pcrTestsData.remove(pcrTestData);
     }
+
+    public void addPCRTestDataToList(PCRTestData pcrTestData) {
+        pcrTestsData.add(pcrTestData);
+    }
 }

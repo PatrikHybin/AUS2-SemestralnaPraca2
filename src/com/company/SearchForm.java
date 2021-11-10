@@ -42,10 +42,11 @@ public class SearchForm extends JDialog {
     private DatePicker maxDateInput;
     private DatePicker minDateInput;
     private JTextArea taskInfo;
+    private JCheckBox task16;
     private ArrayList<JCheckBox> checkBoxes = new ArrayList<>();
     private String[] inputs = {null,null,null,null,null,null,null,null,null};
 
-    public SearchForm(Program program) {
+    public SearchForm() {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
@@ -64,6 +65,7 @@ public class SearchForm extends JDialog {
         checkBoxes.add(task13);
         checkBoxes.add(task14);
         checkBoxes.add(task15);
+        checkBoxes.add(task16);
 
 
         for (JCheckBox checkBox: checkBoxes) {
@@ -77,7 +79,6 @@ public class SearchForm extends JDialog {
                                 checkBox.setSelected(false);
                             } else {
                                 taskInfo.setText(checkBox.getToolTipText());
-
                             }
                         }
                     }
@@ -87,7 +88,7 @@ public class SearchForm extends JDialog {
 
         buttonOK.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                onOK(program);
+                onOK();
             }
         });
 
@@ -113,7 +114,7 @@ public class SearchForm extends JDialog {
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
     //TODO(check if there is correct input)
-    private void onOK(Program program) {
+    private void onOK() {
         inputs[0] = getSearchTestResultInput();
         inputs[1] = getTestCodeInput();
         inputs[2] = getPersonIdInput();
@@ -125,7 +126,7 @@ public class SearchForm extends JDialog {
         inputs[8] = getIllTimeInput();
         for (JCheckBox checkBox: checkBoxes){
             if (checkBox.isSelected()) {
-                program.search(checkBox.getText(), inputs);
+                Controller.search(checkBox.getText(), inputs);
                 dispose();
             }
         }

@@ -74,8 +74,11 @@ public class TwoThreeTreeTester {
     }
 
     public void testIntervalSearch() {
-        PCRTestUUID pcrTestUUIDmin = pcrTests.get(50);
-        PCRTestUUID pcrTestUUIDmax = pcrTests.get(10000);
+        Random r = new Random();
+        int min = r.nextInt(pcrTests.size());
+        PCRTestUUID pcrTestUUIDmin = pcrTests.get(min);
+        int max = r.nextInt(pcrTests.size() - min);
+        PCRTestUUID pcrTestUUIDmax = pcrTests.get(min + max);
 
         ArrayList<PCRTestUUID> inOrderIntervalTests;
         inOrderIntervalTests = tree.getInterval(pcrTestUUIDmin, pcrTestUUIDmax);

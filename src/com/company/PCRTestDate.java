@@ -31,4 +31,5 @@ public class PCRTestDate implements Comparable<PCRTestDate> {
     public PCRTestData getPcrTestData() {
         return pcrTestData;
     }
+
 }

@@ -174,7 +174,7 @@
             </constraints>
             <properties>
               <text value="14"/>
-              <toolTipText value="4. Výpis krajov usporiadaných podľa počtu chorých osôb k zadanému dátumu, pričom osobu považujeme za chorú X dní od pozitívneho testu (X zadá užívateľ)."/>
+              <toolTipText value="Výpis krajov usporiadaných podľa počtu chorých osôb k zadanému dátumu, pričom osobu považujeme za chorú X dní od pozitívneho testu (X zadá užívateľ)."/>
             </properties>
           </component>
           <component id="afefe" class="javax.swing.JCheckBox" binding="task15">
@@ -184,6 +184,15 @@
             <properties>
               <text value="15"/>
               <toolTipText value="Výpis všetkých testov uskutočnených za zadané časové obdobie na danom pracovisku (definované kódom pracoviska)."/>
+            </properties>
+          </component>
+          <component id="acf58" class="javax.swing.JCheckBox" binding="task16">
+            <constraints>
+              <grid row="3" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="16"/>
+              <toolTipText value="Vyhľadanie PCR testu podľa jeho kódu. "/>
             </properties>
           </component>
         </children>

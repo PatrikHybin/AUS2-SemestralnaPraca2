@@ -6,7 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class PCRTestForm extends JDialog {
+public class AddPCRTestForm extends JDialog {
     private JPanel pcrTestForm;
     private JButton buttonOK;
     private JButton buttonCancel;
@@ -24,14 +24,14 @@ public class PCRTestForm extends JDialog {
     private JLabel note;
     private String[] inputs = {null,null,null,null,null,null,null};
 
-    public PCRTestForm(Program program) {
+    public AddPCRTestForm() {
         setContentPane(pcrTestForm);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
 
         buttonOK.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                onOK(program);
+                onOK();
             }
         });
 
@@ -57,7 +57,7 @@ public class PCRTestForm extends JDialog {
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 
-    private void onOK(Program program) {
+    private void onOK() {
         System.out.println(getDateAndTimeOfTestInput());
         inputs[0] = getDateAndTimeOfTestInput();
         inputs[1] = getTestResultInput();
@@ -72,12 +72,12 @@ public class PCRTestForm extends JDialog {
             testResult.setText("Test result");
             testResult.setForeground(Color.black);
 
-            if (program.checkIfPersonExists(inputs[2])) {
+            if (Controller.checkIfPersonExists(inputs[2])) {
                 idNumberOfPatientInput.setText("ID number of patient");
                 idNumberOfPatientInput.setForeground(Color.black);
 
                 if (!inputs[0].equals("")) {
-                    program.addPCRTest(inputs);
+                    Controller.addPCRTest(inputs);
                     dispose();
                 }
             } else {

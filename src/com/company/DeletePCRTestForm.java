@@ -1,26 +1,19 @@
 package com.company;
 
-import javafx.scene.web.PromptData;
-
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.*;
 
-public class GenerateForm extends JDialog {
+public class DeletePCRTestForm extends JDialog {
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
-    private JTextField personsNumberInput;
-    private JTextField testNumberInput;
-    private JLabel zeroPersons;
+    private JTextField pcrTestToDelete;
 
-    public GenerateForm() {
+    public DeletePCRTestForm() {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
-        Dimension dim = new Dimension();
-        dim.setSize(400, 155);
-        setMinimumSize(dim);
+
         buttonOK.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 onOK();
@@ -50,16 +43,8 @@ public class GenerateForm extends JDialog {
     }
 
     private void onOK() {
-        Controller.generatePersons(getPersonsNumberInput());
-        if (!Controller.checkNumberOfPersons()) {
-            zeroPersons.setText("To generate PCRTests you need at least one person!");
-            zeroPersons.setForeground(Color.red);
-        } else {
-            zeroPersons.setText("");
-            zeroPersons.setForeground(Color.black);
-            Controller.generatePCRTest(getTestNumberInput());
-            dispose();
-        }
+        Controller.deletePCRTest(pcrTestToDelete.getText());
+        dispose();
     }
 
     private void onCancel() {
@@ -67,11 +52,4 @@ public class GenerateForm extends JDialog {
         dispose();
     }
 
-    public String getPersonsNumberInput() {
-        return personsNumberInput.getText();
-    }
-
-    public String getTestNumberInput() {
-        return testNumberInput.getText();
-    }
 }

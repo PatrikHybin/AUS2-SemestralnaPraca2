@@ -7,7 +7,7 @@ import java.awt.*;
 import java.awt.event.*;
 
 
-public class PersonForm extends JDialog {
+public class AddPersonForm extends JDialog {
     private JPanel personForm;
     private JButton buttonOK;
     private JButton buttonCancel;
@@ -21,7 +21,7 @@ public class PersonForm extends JDialog {
     private JLabel birthday;
     private String[] inputs = {null,null,null,null};
 
-    public PersonForm(Program program) {
+    public AddPersonForm() {
         setTitle("Person Form");
         setSize(300, 300);
         setContentPane(personForm);
@@ -31,7 +31,7 @@ public class PersonForm extends JDialog {
 
         buttonOK.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                onOK(program);
+                onOK();
             }
         });
 
@@ -57,7 +57,7 @@ public class PersonForm extends JDialog {
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 
-    private void onOK(Program program) {
+    private void onOK() {
         inputs[0] = getNameInput();
         inputs[1] = getSurnameInput();
         inputs[2] = getIdNumberInput();
@@ -95,7 +95,7 @@ public class PersonForm extends JDialog {
         if (inputs[0].equals("") || inputs[1].equals("") || inputs[2].equals("") || inputs[3].equals("")) {
 
         } else {
-            program.addPerson(inputs);
+            Controller.addPerson(inputs);
             dispose();
         }
 

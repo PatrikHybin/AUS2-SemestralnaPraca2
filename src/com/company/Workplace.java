@@ -31,7 +31,7 @@ public class Workplace implements Comparable<Workplace> {
         return pcrTestDateTree;
     }
 
-    public TwoThreeTree<PCRTestDate> getPcrTestPositiveTree() {
+    public TwoThreeTree<PCRTestDate> getPcrTestDatePositiveTree() {
         return prcTestDatePositiveTree;
     }
 

@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public class PCRTestData {
     protected LocalDateTime dateAndTimeOfTest;
-    protected Person patient;
+    protected Person person;
     protected UUID testCode;
     protected int workplaceCode;
     protected int districtCode;
@@ -18,9 +18,9 @@ public class PCRTestData {
         this.testCode = testCode;
     }
 
-    public PCRTestData(UUID testCode, LocalDateTime dateAndTimeOfTest, String result , Person patient, int workplaceCode, int districtCode, int regionCode, String note) {
+    public PCRTestData(UUID testCode, LocalDateTime dateAndTimeOfTest, String result , Person person, int workplaceCode, int districtCode, int regionCode, String note) {
         this.dateAndTimeOfTest = dateAndTimeOfTest;
-        this.patient = patient;
+        this.person = person;
         this.testCode = testCode;
         this.workplaceCode = workplaceCode;
         this.districtCode = districtCode;
@@ -41,12 +41,12 @@ public class PCRTestData {
         this.dateAndTimeOfTest = dateAndTimeOfTest;
     }
 
-    public Person getPatient() {
-        return patient;
+    public Person getPerson() {
+        return person;
     }
 
-    public void setPatient(Person patient) {
-        this.patient = patient;
+    public void setPerson(Person person) {
+        this.person = person;
     }
 
     public UUID getTestCode() {

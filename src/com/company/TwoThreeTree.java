@@ -277,6 +277,7 @@ public class TwoThreeTree<T extends Comparable<T>> {
             } else {
                 node.setLeftData(null);
                 if (node == root) {
+                    root = null;
                     return;
                 }
             }
@@ -702,7 +703,7 @@ public class TwoThreeTree<T extends Comparable<T>> {
     public ArrayList<T> getInterval(T minData, T maxData) {
         TwoThreeNode<T> node = findIntervalMinNode(minData);
         if (node == null) {
-            System.out.println("node is null in getInterval");
+            //System.out.println("node is null in getInterval");
         }
         return inOrderIntervalMinMax(node, minData, maxData);
     }

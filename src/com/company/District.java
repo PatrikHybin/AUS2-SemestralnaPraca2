@@ -1,5 +1,7 @@
 package com.company;
 
+import java.sql.SQLOutput;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class District implements Comparable<District> {
@@ -47,5 +49,16 @@ public class District implements Comparable<District> {
 
     public void setRegion(Region region) {
         this.region = region;
+    }
+
+    public int getNumberOfIllPersons(String[] inputs) {
+        LocalDateTime personIllTo = LocalDateTime.parse(inputs[6]);
+        personIllTo = personIllTo.plusDays(Integer.parseInt(inputs[8]));
+        ArrayList<PCRTestDate> tests = new ArrayList<>();
+        for (Workplace workplace : workplaces) {
+            tests.addAll(workplace.getPcrTestDatePositiveTree().getInterval(new PCRTestDate(new PCRTestData(LocalDateTime.parse(inputs[6]))), new PCRTestDate(new PCRTestData(personIllTo))));
+        }
+
+        return tests.size();
     }
 }
