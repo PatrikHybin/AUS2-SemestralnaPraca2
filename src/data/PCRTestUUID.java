@@ -1,4 +1,4 @@
-package com.company;
+package data;
 
 public class PCRTestUUID implements Comparable<PCRTestUUID> {
 

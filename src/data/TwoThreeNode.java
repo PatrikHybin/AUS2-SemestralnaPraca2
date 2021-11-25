@@ -1,4 +1,4 @@
-package com.company;
+package data;
 
 public class TwoThreeNode<T extends Comparable<T>> {
     private TwoThreeNode<T> parent = null;

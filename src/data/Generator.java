@@ -1,18 +1,20 @@
-package com.company;
+package data;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Generator {
     private ArrayList<Region> regions = new ArrayList<>();
     private ArrayList<District> districts = new ArrayList<>();
     private ArrayList<Workplace> workplaces = new ArrayList<>();
     private ArrayList<Person> persons = new ArrayList<>();
-    private ArrayList<PCRTestData> pcrTestsData = new ArrayList<>();
+
     private String[] names = new String[] {"James", "John", "Robert", "Michael", "William", "David", "Richard", "Joseph", "Thomas", "Charles", "Christopher","Ashley","Jacob","Lisa",
             "Daniel", "Matthew", "Anthony", "Donald", "Mark", "Paul", "Steven", "Andrew", "Kenneth", "Joshua", "Kevin", "Brian", "Edward", "Ronald", "Timothy", "Jason", "Jeffrey", "Ryan",
             "Jonathan", "Stephen", "Larry", "Justin", "Scott", "Brandon", "Mary", "Patricia", "Jennifer", "Linda", "Elizabeth", "Barbara", "Susan", "Jessica", "Sarah", "Karen", "Nancy",
@@ -50,7 +52,7 @@ public class Generator {
                 tmp = j + 1;
                 District district = new District(Integer.parseInt(regions.get(i).getRegionCode() + "" + tmp));
                 districts.add(district);
-                regions.get(i).insertDistrict(district);
+                //regions.get(i).insertDistrict(district);
                 regions.get(i).getDistricts().add(district);
                 district.setRegion(regions.get(i));
             }
@@ -64,27 +66,29 @@ public class Generator {
                 tmp = j + 1;
                 Workplace workplace = new Workplace(Integer.parseInt(districts.get(i).getDistrictCode() + "" + tmp));
                 workplaces.add(workplace);
-                districts.get(i).insertWorkplace(workplace);
+                //districts.get(i).insertWorkplace(workplace);
                 districts.get(i).getWorkplaces().add(workplace);
                 workplace.setDistrict(districts.get(i));
             }
         }
     }
 
-    public ArrayList<Person> generatePersons(String number) {
-        ArrayList<Person> tmp = new ArrayList<>();
+    public void generatePersons(String number, Program program) {
         int generateNum;
         if (number.equals("")) {
             generateNum = 0;
         } else {
             generateNum = Integer.parseInt(number);
+            if (persons == null) {
+                persons = new ArrayList<>(Integer.parseInt(number));
+            }
         }
         Random r = new Random();
-        LocalDate baseDate = LocalDate.of(1950, 1, 1);
+        LocalDate baseDate = LocalDate.of(1940, 1, 1);
         String name;
         String surname;
         int randomDays;
-        int maxDays = 55*365;
+        int maxDays = 70*365;
         LocalDate birthday;
         //r.nextInt() % (100 - 1) + 1
 
@@ -93,18 +97,19 @@ public class Generator {
             surname = names[r.nextInt(names.length)];
             randomDays = (int)(maxDays*Math.random());
             birthday = baseDate.plusDays(randomDays);
-            String idNumber = DateTimeFormatter.ofPattern("yyMMdd").format(birthday) + "/" + UUID.randomUUID().toString().substring(0,4);
+            String idNumber = DateTimeFormatter.ofPattern("yyMMdd").format(birthday) + "/" + UUID.randomUUID().toString().substring(0,6);
             Person person = new Person(name, surname, idNumber ,birthday);
             persons.add(person);
-            tmp.add(person);
+
+            boolean outcome = program.getPersonTree().insert(person);
+            if (!outcome) {
+                deletePersonFromList(person);
+            }
         }
-        return tmp;
     }
 
 
-
-    public ArrayList<PCRTestData> generatePCRTestsData(String number) {
-        ArrayList<PCRTestData> tmp = new ArrayList<>();
+    public void generatePCRTests(String number, Program program) {
         int generateNum;
         if (number.equals("")) {
             generateNum = 0;
@@ -114,38 +119,55 @@ public class Generator {
         Random r = new Random();
         Person person;
 
-        LocalDate baseDate = LocalDate.of(2019, 1, 1);
-        LocalDate localDate;
-        int randomDays;
-        int maxDays = 2*365;
-        LocalDateTime timeOfTest;
 
-        String hour;
-        String minutes;
+        LocalDateTime timeOfTest;
+        LocalDate baseDate;
+
+        LocalTime time;
         String result;
         Workplace workplace;
         District district;
         Region region;
 
+
         for (int i = 0; i < generateNum; i++) {
             person = persons.get(r.nextInt(persons.size()));
-            randomDays = (int)(maxDays*Math.random());
-            localDate = baseDate.plusDays(randomDays);
-            timeOfTest = LocalDateTime.parse(localDate + "T" + String.format("%02d", r.nextInt(24)) + ":" + String.format("%02d",  r.nextInt(2) * 30));
+            baseDate = LocalDate.now().minusDays(r.nextInt(1000));
+            time = LocalTime.MIN.plusSeconds(r.nextLong());
+            timeOfTest = LocalDateTime.parse(baseDate + "T" + time.toString().substring(0,5));
+
+            //timeOfTest = LocalDateTime.parse(localDate + "T" + String.format("%02d", r.nextInt(24)) + ":" + String.format("%02d",  r.nextInt(2) * 30));
             if (r.nextInt(100) < 50) {
                 result = "Positive";
             } else {
                 result = "Negative";
             }
-            region = regions.get(r.nextInt(regions.size()));
-            district = region.getDistricts().get(r.nextInt(region.getDistricts().size()));
-            workplace = district.getWorkplaces().get(r.nextInt(district.getWorkplaces().size()));
+            workplace = workplaces.get(r.nextInt(workplaces.size()));
+            district = workplace.getDistrict();
+            region = district.getRegion();
 
             PCRTestData pcrTestData = new PCRTestData(UUID.randomUUID(), timeOfTest, result, person, workplace.getWorkplaceCode(), district.getDistrictCode() ,region.getRegionCode(), "Generated");
-            tmp.add(pcrTestData);
-            pcrTestsData.add(pcrTestData);
+
+            PCRTestUUID pcrTestUUID = new PCRTestUUID(pcrTestData);
+            PCRTestDate pcrTestDate = new PCRTestDate(pcrTestData);
+            PCRTestNote pcrTestNote = new PCRTestNote(pcrTestData);
+
+            program.getPcrTestUUIDTree().insert(pcrTestUUID);
+            program.getPcrTestDateTree().insert(pcrTestDate);
+            if (pcrTestData.getResult() == "Positive") {
+                program.getPcrTestPositiveDateTree().insert(pcrTestDate);
+            }
+
+            person.getPcrTestDateTree().insert(pcrTestDate);
+            person.getPcrTestUUIDTree().insert(pcrTestUUID);
+
+            workplace.insertPCRTestDate(pcrTestDate);
+            district.insertPCRTestDate(pcrTestDate);
+
+            district.getPcrTestNoteTree().insert(pcrTestNote);
+
+            region.insertPCRTestDate(pcrTestDate);
         }
-        return tmp;
     }
 
     public ArrayList<Region> getRegions() {
@@ -176,11 +198,11 @@ public class Generator {
         return persons.size();
     }
 
-    public void deletePCRTestDataFromList(PCRTestData pcrTestData) {
+    /*public void deletePCRTestDataFromList(PCRTestData pcrTestData) {
         pcrTestsData.remove(pcrTestData);
     }
 
     public void addPCRTestDataToList(PCRTestData pcrTestData) {
         pcrTestsData.add(pcrTestData);
-    }
+    }*/
 }

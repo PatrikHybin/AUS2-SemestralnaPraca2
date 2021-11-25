@@ -1,4 +1,4 @@
-package com.company;
+package data;
 
 public class Workplace implements Comparable<Workplace> {
     private Integer workplaceCode;
@@ -6,7 +6,7 @@ public class Workplace implements Comparable<Workplace> {
     private TwoThreeTree<PCRTestDate> prcTestDatePositiveTree = new TwoThreeTree<>();
     private District district;
 
-    Workplace(int workplaceCode) {
+    public Workplace(int workplaceCode) {
         this.workplaceCode = workplaceCode;
     }
 
@@ -38,10 +38,8 @@ public class Workplace implements Comparable<Workplace> {
     public void insertPCRTestDate(PCRTestDate pcrTest) {
         if (pcrTest.getPcrTestData().getResult().equals("Positive")) {
             prcTestDatePositiveTree.insert(pcrTest);
-            pcrTestDateTree.insert(pcrTest);
-        } else {
-            pcrTestDateTree.insert(pcrTest);
         }
+        pcrTestDateTree.insert(pcrTest);
     }
 
     public District getDistrict() {

@@ -1,7 +1,6 @@
-package com.company;
+package data;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.UUID;
 
 public class PCRTestData {
@@ -31,6 +30,11 @@ public class PCRTestData {
 
     public PCRTestData(LocalDateTime date) {
         this.dateAndTimeOfTest = date;
+    }
+
+    public PCRTestData(LocalDateTime date, UUID testCode) {
+        this.dateAndTimeOfTest = date;
+        this.testCode = testCode;
     }
 
     public LocalDateTime getDateAndTimeOfTest() {

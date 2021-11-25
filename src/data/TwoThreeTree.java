@@ -1,10 +1,11 @@
-package com.company;
+package data;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 public class TwoThreeTree<T extends Comparable<T>> {
     private TwoThreeNode<T> root;
+    public int dataNum;
+
     public static final int case1 = 1;
     public static final int case2 = 2;
     public static final int case3a = 31;
@@ -19,16 +20,19 @@ public class TwoThreeTree<T extends Comparable<T>> {
     public boolean insert(T data) {
         if (root == null) {
             root = new TwoThreeNode<>(data);
+            dataNum++;
             return true;
         }
 
         if (root.getLeftData() == null && root.getRightData() == null) {
             root.setLeftData(data);
+            dataNum++;
             return true;
         }
 
         TwoThreeNode<T> node;
         if (find(data) == null) {
+            dataNum++;
             node = findLeafNode(data);
             ArrayList<T> dataList;
             //leaf is 2node
@@ -216,7 +220,7 @@ public class TwoThreeTree<T extends Comparable<T>> {
         return node;
     }
 
-    //Implementovane podla prednasky
+    //Implementovane podla prednasky/pseudokodu z http://frdsa.fri.uniza.sk/~jankovic/WEB/struktury/ADS/interaktivny_mod/ads_2_3_strom_im.html
     public T find(T data) {
         TwoThreeNode<T> node;
         node = findNode(data);
@@ -266,6 +270,7 @@ public class TwoThreeTree<T extends Comparable<T>> {
             return;
         }
         TwoThreeNode<T> predecessor = inOrderPredecessor(node, data);
+        dataNum--;
         if (node.isLeaf()) {
             if (node.getRightData() != null) {
                 if (node.getLeftData().compareTo(data) == 0) {
@@ -591,9 +596,9 @@ public class TwoThreeTree<T extends Comparable<T>> {
 
     //Implementovane podla vlastnych materialov
     public ArrayList<T> inOrder() {
-        ArrayList<T> list = new ArrayList<>();
+        ArrayList<T> list = new ArrayList<>(dataNum);
         if (root == null || (root.getLeftData() == null && root.getRightData() == null)) {
-            System.out.println("There is no root or root has no data(inOrder)");
+            //System.out.println("There is no root or root has no data(inOrder)");
             return list;
         }
         TwoThreeNode<T> node = root;
@@ -763,18 +768,27 @@ public class TwoThreeTree<T extends Comparable<T>> {
                             break;
                         }
                         list.add(node.getLeftData());
+                        if (node.getLeftData().compareTo(maxData) == 0) {
+                            break;
+                        }
                     }
                     if (node.getRightData().compareTo(maxData) > 0) {
                         break;
                     }
                     list.add(node.getRightData());
                     current = node.getRightData();
+                    if (node.getRightData().compareTo(maxData) == 0) {
+                        break;
+                    }
                 } else {
                     if (node.getLeftData().compareTo(maxData) > 0) {
                         break;
                     }
                     list.add(node.getLeftData());
                     current = node.getLeftData();
+                    if (node.getLeftData().compareTo(maxData) == 0) {
+                        break;
+                    }
                 }
                 node = inOrderSuccessor(node, current);
             } else {
@@ -785,12 +799,18 @@ public class TwoThreeTree<T extends Comparable<T>> {
                         }
                         list.add(node.getLeftData());
                         current = node.getLeftData();
+                        if (node.getLeftData().compareTo(maxData) == 0) {
+                            break;
+                        }
                     } else {
                         if (node.getRightData().compareTo(maxData) > 0) {
                             break;
                         }
                         list.add(node.getRightData());
                         current = node.getRightData();
+                        if (node.getRightData().compareTo(maxData) == 0) {
+                            break;
+                        }
                     }
                 } else {
                     if (node.getLeftData().compareTo(maxData) > 0) {
@@ -798,6 +818,9 @@ public class TwoThreeTree<T extends Comparable<T>> {
                     }
                     list.add(node.getLeftData());
                     current = node.getLeftData();
+                    if (node.getLeftData().compareTo(maxData) == 0) {
+                        break;
+                    }
                 }
                 node = inOrderSuccessor(node, current);
             }

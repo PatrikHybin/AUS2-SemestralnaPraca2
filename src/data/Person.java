@@ -1,10 +1,6 @@
-package com.company;
+package data;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.Date;
 
 public class Person implements Comparable<Person> {
     private String name;

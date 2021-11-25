@@ -1,5 +1,6 @@
-package com.company;
+package gui;
 
+import controller.Controller;
 import com.github.lgooddatepicker.components.DatePicker;
 
 import javax.swing.*;

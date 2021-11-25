@@ -1,6 +1,9 @@
-package com.company;
+package gui;
+
+import controller.Controller;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -21,10 +24,11 @@ public class AppGUI extends JFrame {
     private JButton deletePersonButton;
     private JButton saveButton;
     private JButton loadButton;
+    private JLabel numberOfData;
 
     Object[][] data;
 
-    public AppGUI(Program program) {
+    public AppGUI() {
 
         setContentPane(mainPanel);
         setTitle("Hello!");
@@ -47,7 +51,10 @@ public class AppGUI extends JFrame {
                 addPCRTestForm.pack();
                 addPCRTestForm.setLocationRelativeTo(null);
                 addPCRTestForm.setVisible(true);
+
+                table.setModel(new DefaultTableModel(0,0));
                 table.setModel(Controller.getPCRTestsTable());
+                WriteNumberOfData();
             }
         });
 
@@ -59,8 +66,9 @@ public class AppGUI extends JFrame {
                 addPersonForm.pack();
                 addPersonForm.setLocationRelativeTo(null);
                 addPersonForm.setVisible(true);
+                table.setModel(new DefaultTableModel(0,0));
                 table.setModel(Controller.getPersonsTable(null));
-
+                WriteNumberOfData();
                 /* cez list
                 DefaultListModel listModel = new DefaultListModel();
                 for (PCRTestTEST test : program.tree.inOrder()) {
@@ -73,7 +81,10 @@ public class AppGUI extends JFrame {
         showPCRTests.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                table.setModel(new DefaultTableModel(0,0));
                 table.setModel(Controller.getPCRTestsTable());
+                table.getColumn("Person").setPreferredWidth(350);
+                WriteNumberOfData();
             }
         });
 
@@ -81,6 +92,7 @@ public class AppGUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 table.setModel(Controller.getPersonsTable(null));
+                WriteNumberOfData();
             }
         });
 
@@ -94,6 +106,7 @@ public class AppGUI extends JFrame {
                 searchForm.setVisible(true);
                 if (Controller.getSearchedTable() != null) {
                     table.setModel(Controller.getSearchedTable());
+                    WriteNumberOfData();
                 }
             }
         });
@@ -117,6 +130,7 @@ public class AppGUI extends JFrame {
                 deletePCRTestForm.setLocationRelativeTo(null);
                 deletePCRTestForm.setVisible(true);
                 table.setModel(Controller.getPCRTestsTable());
+                WriteNumberOfData();
             }
         });
         deletePersonButton.addActionListener(new ActionListener() {
@@ -128,6 +142,7 @@ public class AppGUI extends JFrame {
                 deletePersonForm.setLocationRelativeTo(null);
                 deletePersonForm.setVisible(true);
                 table.setModel(Controller.getPersonsTable(null));
+                WriteNumberOfData();
             }
         });
 
@@ -143,6 +158,10 @@ public class AppGUI extends JFrame {
                 Controller.load();
             }
         });
+    }
+
+    private void WriteNumberOfData() {
+        numberOfData.setText("Number of data: " + table.getModel().getRowCount());
     }
 
 }

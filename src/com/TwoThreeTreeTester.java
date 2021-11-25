@@ -1,4 +1,8 @@
-package com.company;
+package com;
+
+import data.PCRTestData;
+import data.PCRTestUUID;
+import data.TwoThreeTree;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,18 +30,6 @@ public class TwoThreeTreeTester {
                 System.out.println("100k");
                 chance = 30;
             }
-            if (count == 120000) {
-                System.out.println("120k");
-            }
-            if (count == 140000) {
-                System.out.println("140k");
-            }
-            if (count == 160000) {
-                System.out.println("160k");
-            }
-            if (count == 180000) {
-                System.out.println("180k");
-            }
             count++;
             //insert
             if (r.nextInt(100) + 1 <= chance) {
@@ -56,6 +48,10 @@ public class TwoThreeTreeTester {
 
 
         }
+
+        System.out.println(tree.dataNum + " tree");
+        System.out.println(pcrTests.size() + " list");
+
         Collections.sort(pcrTests);
         inOrderTests = tree.inOrder();
         if (inOrderTests.size() != pcrTests.size()) {

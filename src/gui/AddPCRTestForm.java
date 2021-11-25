@@ -1,5 +1,6 @@
-package com.company;
+package gui;
 
+import controller.Controller;
 import com.github.lgooddatepicker.components.DateTimePicker;
 
 import javax.swing.*;
@@ -22,7 +23,7 @@ public class AddPCRTestForm extends JDialog {
     private JLabel idNumberOfPatient;
     private JLabel workplaceCode;
     private JLabel note;
-    private String[] inputs = {null,null,null,null,null,null,null};
+    private String[] inputs = new String[8];
 
     public AddPCRTestForm() {
         setContentPane(pcrTestForm);
@@ -58,7 +59,6 @@ public class AddPCRTestForm extends JDialog {
     }
 
     private void onOK() {
-        System.out.println(getDateAndTimeOfTestInput());
         inputs[0] = getDateAndTimeOfTestInput();
         inputs[1] = getTestResultInput();
         inputs[2] = getIdNumberOfPatientInput();

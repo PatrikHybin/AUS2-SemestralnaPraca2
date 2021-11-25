@@ -1,15 +1,15 @@
-package com.company;
+package data;
 
-public class PCRTestDate implements Comparable<PCRTestDate> {
+public class PCRTestNote implements Comparable<PCRTestNote> {
 
     private PCRTestData pcrTestData;
 
-    public PCRTestDate(PCRTestData data) {
+    public PCRTestNote(PCRTestData data) {
         pcrTestData = data;
     }
     @Override
-    public int compareTo(PCRTestDate pcrTest) {
-        if (this.pcrTestData.dateAndTimeOfTest.compareTo(pcrTest.pcrTestData.dateAndTimeOfTest) == 0) {
+    public int compareTo(PCRTestNote pcrTest) {
+        if (this.pcrTestData.note.compareTo(pcrTest.pcrTestData.note) == 0) {
             if (this.pcrTestData.testCode.compareTo(pcrTest.pcrTestData.testCode) == 0) {
                 return 0;
             } else {
@@ -20,7 +20,7 @@ public class PCRTestDate implements Comparable<PCRTestDate> {
                 }
             }
         } else {
-            if (this.pcrTestData.dateAndTimeOfTest.compareTo(pcrTest.pcrTestData.dateAndTimeOfTest) < 0) {
+            if (this.pcrTestData.note.compareTo(pcrTest.pcrTestData.note) < 0) {
                 return -1;
             } else {
                 return 1;

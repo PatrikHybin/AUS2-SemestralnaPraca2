@@ -1,15 +1,17 @@
-package com.company;
+package gui;
+
+import controller.Controller;
 
 import javax.swing.*;
 import java.awt.event.*;
 
-public class DeletePCRTestForm extends JDialog {
+public class DeletePersonForm extends JDialog {
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
-    private JTextField pcrTestToDelete;
+    private JTextField personToDelete;
 
-    public DeletePCRTestForm() {
+    public DeletePersonForm() {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
@@ -43,7 +45,7 @@ public class DeletePCRTestForm extends JDialog {
     }
 
     private void onOK() {
-        Controller.deletePCRTest(pcrTestToDelete.getText());
+        Controller.deletePerson(personToDelete.getText());
         dispose();
     }
 
@@ -51,5 +53,6 @@ public class DeletePCRTestForm extends JDialog {
         // add your code here if necessary
         dispose();
     }
+
 
 }

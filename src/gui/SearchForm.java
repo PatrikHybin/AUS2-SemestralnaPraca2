@@ -1,12 +1,10 @@
-package com.company;
+package gui;
 
+import controller.Controller;
 import com.github.lgooddatepicker.components.DatePicker;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 
 public class SearchForm extends JDialog {
@@ -38,11 +36,11 @@ public class SearchForm extends JDialog {
     private JLabel dateFrom;
     private JTextField illTimeInput;
     private JComboBox searchTestResultInput;
-    private JLabel testResult;
     private DatePicker maxDateInput;
     private DatePicker minDateInput;
     private JTextArea taskInfo;
     private JCheckBox task16;
+    private JCheckBox task20;
     private ArrayList<JCheckBox> checkBoxes = new ArrayList<>();
     private String[] inputs = {null,null,null,null,null,null,null,null,null};
 
@@ -66,6 +64,7 @@ public class SearchForm extends JDialog {
         checkBoxes.add(task14);
         checkBoxes.add(task15);
         checkBoxes.add(task16);
+        checkBoxes.add(task20);
 
 
         for (JCheckBox checkBox: checkBoxes) {
@@ -115,15 +114,15 @@ public class SearchForm extends JDialog {
     }
     //TODO(check if there is correct input)
     private void onOK() {
-        inputs[0] = getSearchTestResultInput();
-        inputs[1] = getTestCodeInput();
-        inputs[2] = getPersonIdInput();
-        inputs[3] = getRegionCodeInput();
-        inputs[4] = getDistrictCodeInput();
-        inputs[5] = getWorkplaceCodeInput();
-        inputs[6] = getMinDateInput() + "T00:00";
-        inputs[7] = getMaxDateInput() + "T23:59";
-        inputs[8] = getIllTimeInput();
+        //inputs[0] = getSearchTestResultInput();
+        inputs[0] = getTestCodeInput();
+        inputs[1] = getPersonIdInput();
+        inputs[2] = getRegionCodeInput().split("\\.")[0];
+        inputs[3] = getDistrictCodeInput();
+        inputs[4] = getWorkplaceCodeInput();
+        inputs[5] = getMinDateInput() + "T00:00";
+        inputs[6] = getMaxDateInput() + "T23:59";
+        inputs[7] = getIllTimeInput();
         for (JCheckBox checkBox: checkBoxes){
             if (checkBox.isSelected()) {
                 Controller.search(checkBox.getText(), inputs);
@@ -169,7 +168,4 @@ public class SearchForm extends JDialog {
         return illTimeInput.getText();
     }
 
-    public String getSearchTestResultInput() {
-        return searchTestResultInput.toString();
-    }
 }
