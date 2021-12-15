@@ -160,13 +160,6 @@ public class AppGUI extends JFrame {
                 Controller.load();
             }
         });
-        outputSek.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("sek click");
-                Controller.writeOutSequence();
-            }
-        });
         seqListButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
