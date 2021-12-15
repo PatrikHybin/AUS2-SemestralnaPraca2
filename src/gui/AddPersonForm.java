@@ -64,7 +64,6 @@ public class AddPersonForm extends JDialog {
         inputs[2] = getIdNumberInput();
         inputs[3] = getBirthdayInput();
 
-        //TODO: one method ????
         if (inputs[0].equals("")) {
             name.setText("Name - Missing data");
             name.setForeground(Color.red);

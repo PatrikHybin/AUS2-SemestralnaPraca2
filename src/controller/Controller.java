@@ -2,6 +2,8 @@ package controller;
 
 import data.*;
 
+import com.UFile;
+
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.text.DateFormatter;
@@ -16,8 +18,6 @@ public class Controller {
     private static Program program;
     private static DefaultTableModel searchTableModel;
 
-
-
     public Controller(Program prog) {
         program = prog;
     }
@@ -26,10 +26,14 @@ public class Controller {
         if (inputs[3] == null) {
             return;
         }
-        Person person = new Person(inputs[0], inputs[1], inputs[2], LocalDate.parse(inputs[3]));
-        boolean insert = program.getPersonTree().insert(person);
-        if (insert) {
+        Person person = new Person(inputs[0], inputs[1], inputs[2], LocalDate.parse(inputs[3]), program.getPcrTestDateFile());
+        System.out.println(person.getName());
+        program.insertPerson(person);
+
+        if (program.getPersonTree().insert(person)) {
             program.getGenerator().addPersonToList(person);
+        } else {
+            program.deletePerson(person.getAddress());
         }
     }
 
@@ -42,32 +46,39 @@ public class Controller {
         }
         Workplace workplace = program.getWorkplaceTree().find(new Workplace(Integer.parseInt(inputs[3])));
         Person person = program.getPersonTree().find(new Person(inputs[2]));
-        PCRTestData pcrTestData = new PCRTestData(uuid, LocalDateTime.parse(inputs[0]), inputs[1], person, workplace.getWorkplaceCode(), workplace.getDistrict().getDistrictCode(), workplace.getDistrict().getRegion().getRegionCode(), inputs[4]);
-        PCRTestUUID pcrTestUUID = new PCRTestUUID(pcrTestData);
-        PCRTestDate pcrTestDate = new PCRTestDate(pcrTestData);
-        PCRTestNote pcrTestNote = new PCRTestNote(pcrTestData);
-
-        program.getPcrTestUUIDTree().insert(pcrTestUUID);
-        program.getPcrTestDateTree().insert(pcrTestDate);
-        if (pcrTestData.getResult().equals("Positive")) {
-            if (pcrTestData.getTestCode() == null) {
-
-            }
-            program.getPcrTestPositiveDateTree().insert(pcrTestDate);
+        District district = program.getDistrictFile().find(workplace.getDistrictAddress());
+        Region region = program.getRegionFile().find(district.getRegionAddress());
+        boolean result = false;
+        if (inputs[1].equals("Positive")) {
+            result = true;
         }
-        //program.getGenerator().addPCRTestDataToList(pcrTestData);
 
-        person.insertPCRTestUUID(pcrTestUUID);
-        person.insertPCRTestDate(pcrTestDate);
+        PCRTestData pcrTestData = new PCRTestData(uuid, LocalDateTime.parse(inputs[0]), result, person.getAddress(), workplace.getWorkplaceCode(), district.getDistrictCode(), region.getRegionCode(), inputs[4]);
 
-        workplace.insertPCRTestDate(pcrTestDate);
+        program.insertPcrTestData(pcrTestData);
+        PCRTestUUID pcrTestUUID = new PCRTestUUID(pcrTestData.getAddress(), pcrTestData.getTestCode());
+        PCRTestDate pcrTestDate = new PCRTestDate(pcrTestData.getAddress(), pcrTestData.getDateAndTimeOfTest(), pcrTestData.getTestCode());
+        //PCRTestNote pcrTestNote = new PCRTestNote(pcrTestData);
 
-        District district = program.getDistrictTree().find(workplace.getDistrict());
-        district.insertPCRTestDate(pcrTestDate);
-        district.getPcrTestNoteTree().insert(pcrTestNote);
+        program.getPcrTestUUIDFile().insert(pcrTestUUID);
+        program.getPcrTestUUIDTree().insert(pcrTestUUID);
 
-        Region region = program.getRegionTree().find(district.getRegion());
-        region.insertPCRTestDate(pcrTestDate);
+        program.getPcrTestDateFile().insert(pcrTestDate);
+        program.getPcrTestDateTree().insert(pcrTestDate);
+
+        person.insertPCRTestDate(pcrTestDate, program.getPcrTestDateFile());
+        workplace.insertPCRTestDate(pcrTestDate, pcrTestData.getResult(), program.getPcrTestDateFile());
+        district.insertPCRTestDate(pcrTestDate, pcrTestData.getResult(), program.getPcrTestDateFile());
+        region.insertPCRTestDate(pcrTestDate, pcrTestData.getResult(), program.getPcrTestDateFile());
+
+        if (pcrTestData.getResult()) {
+            program.getPcrTestPositiveDateFile().insert(pcrTestDate);
+            program.getPcrTestPositiveDateTree().insert(pcrTestDate);
+
+            workplace.insertPCRTestDatePositive(pcrTestDate, pcrTestData.getResult(), program.getPcrTestPositiveDateFile());
+            district.insertPCRTestDatePositive(pcrTestDate, pcrTestData.getResult(), program.getPcrTestPositiveDateFile());
+            region.insertPCRTestDatePositive(pcrTestDate, pcrTestData.getResult(), program.getPcrTestPositiveDateFile());
+        }
     }
 
     public static void generatePersons(String number) {
@@ -142,13 +153,13 @@ public class Controller {
                 searchPCRTestCode(inputs);
                 break;
             case "20":
-                testsBasedOnNote(inputs);
+                //testsBasedOnNote(inputs);
             default:
                 break;
         }
     }
     //20
-    private static void testsBasedOnNote(String[] inputs) {
+    /*private static void testsBasedOnNote(String[] inputs) {
         District district = program.getDistrictTree().find(new District(Integer.parseInt(inputs[3])));
         ArrayList<PCRTestNote> testsNote;
         testsNote =  district.getPcrTestNoteTree().inOrder();
@@ -161,11 +172,11 @@ public class Controller {
             data[i][0] = pcrTestData.getTestCode() + "";
             data[i][1] = pcrTestData.getDateAndTimeOfTest() + "";
             data[i][2] = pcrTestData.getResult();
-            person = pcrTestData.getPerson();
+            person = program.getPerson(pcrTestData.getPerson());
             if (person != null) {
-                data[i][3] = person.getName() + " " + person.getSurname() + " " + person.getIdNumber() + " " + person.getDateOfBirth();
+                data[i][3] = person.getName() + " " + person.getSurname() + " " + person.getIdNumber() + " " + person.getDateOfBirth().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
             } else {
-                System.out.println("Person null(DateData) big ERROR");
+                System.out.println("Person(UUID) null big ERROR");
             }
             data[i][4] = pcrTestData.getWorkplaceCode() + "";
             data[i][5] = pcrTestData.getDistrictCode() + "";
@@ -174,12 +185,12 @@ public class Controller {
         }
 
         searchTableModel = new DefaultTableModel(data, program.getPcrTestColumnNames());
-    }
+    }*/
 
     //2
     private static void searchPCRTestCode(String[] inputs) {
         ArrayList<PCRTestUUID> tests = new ArrayList<>();
-        PCRTestUUID pcrTestUUID = program.getPcrTestUUIDTree().find(new PCRTestUUID(new PCRTestData(UUID.fromString(inputs[0]))));
+        PCRTestUUID pcrTestUUID = program.getPcrTestUUIDTree().find(new PCRTestUUID(UUID.fromString(inputs[0])));
         if (pcrTestUUID != null) {
             tests.add(pcrTestUUID);
         }
@@ -187,15 +198,16 @@ public class Controller {
         Person person;
         PCRTestData pcrTestData;
         for (int i = 0; i < tests.size(); i++) {
-            pcrTestData = tests.get(i).getPcrTestData();
+            pcrTestData = program.getPcrTestData(pcrTestUUID.getPcrTestData());
+            //pcrTestData = tests.get(i).getPcrTestData();
             data[i][0] = pcrTestData.getTestCode() + "";
             data[i][1] = pcrTestData.getDateAndTimeOfTest() + "";
-            data[i][2] = pcrTestData.getResult();
-            person = pcrTestData.getPerson();
+            data[i][2] = pcrTestData.getResult() ? "Positive" : "Negative";
+            person = program.getPerson(pcrTestData.getPerson());
             if (person != null) {
-                data[i][3] = person.getName() + " " + person.getSurname() + " " + person.getIdNumber() + " " + person.getDateOfBirth();
+                data[i][3] = person.getName() + " " + person.getSurname() + " " + person.getIdNumber() + " " + person.getDateOfBirth().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
             } else {
-                System.out.println("Person null(2,16) big ERROR");
+                System.out.println("Person(UUID) null big ERROR");
             }
             data[i][4] = pcrTestData.getWorkplaceCode() + "";
             data[i][5] = pcrTestData.getDistrictCode() + "";
@@ -208,7 +220,7 @@ public class Controller {
     //3
     private static void searchPersonPCRTests(String[] inputs) {
         Person person = program.getPersonTree().find(new Person(inputs[1]));
-        ArrayList<PCRTestDate> tests = person.getPcrTestDateTree().inOrder();
+        ArrayList<PCRTestDate> tests = person.getPcrTestDateTree(program.getPcrTestDateFile()).inOrder();
 
         searchTableModel = new DefaultTableModel(getPCRTestDateDataToTable(tests), program.getPcrTestColumnNames());
     }
@@ -216,7 +228,7 @@ public class Controller {
     //4
     private static void searchPCRTestPositiveMinMaxDateAndDistrictCode(String[] inputs) {
         District district = program.getDistrictTree().find(new District(Integer.parseInt(inputs[3])));
-        ArrayList<PCRTestDate> tests = district.getPcrTestDatePositiveTree().getInterval(new PCRTestDate(new PCRTestData(LocalDateTime.parse(inputs[5]),UUID.randomUUID())), new PCRTestDate(new PCRTestData(LocalDateTime.parse(inputs[6]),UUID.randomUUID())));
+        ArrayList<PCRTestDate> tests = district.getPcrTestDatePositiveTree(program.getPcrTestPositiveDateFile()).getInterval(new PCRTestDate(LocalDateTime.parse(inputs[5]),UUID.randomUUID()), new PCRTestDate(LocalDateTime.parse(inputs[6]),UUID.randomUUID()));
 
         searchTableModel = new DefaultTableModel(getPCRTestDateDataToTable(tests), program.getPcrTestColumnNames());
     }
@@ -224,7 +236,7 @@ public class Controller {
     //5
     private static void searchPCRTestMinMaxDateAndDistrictCode(String[] inputs) {
         District district = program.getDistrictTree().find(new District(Integer.parseInt(inputs[3])));
-        ArrayList<PCRTestDate> tests = district.getPcrTestDateTree().getInterval(new PCRTestDate(new PCRTestData(LocalDateTime.parse(inputs[5]),UUID.randomUUID())), new PCRTestDate(new PCRTestData(LocalDateTime.parse(inputs[6]),UUID.randomUUID())));
+        ArrayList<PCRTestDate> tests = district.getPcrTestDateTree(program.getPcrTestDateFile()).getInterval(new PCRTestDate(LocalDateTime.parse(inputs[5]),UUID.randomUUID()), new PCRTestDate(LocalDateTime.parse(inputs[6]),UUID.randomUUID()));
 
         /*for (Workplace workplace: district.getWorkPlaceTree().inOrder()) {
             tests.addAll(workplace.getPcrTestDateTree().getInterval(new PCRTestDate(new PCRTestData(LocalDateTime.parse(inputs[6]))), new PCRTestDate(new PCRTestData(LocalDateTime.parse(inputs[7])))));
@@ -236,7 +248,7 @@ public class Controller {
     private static void searchPCRTestPositiveMinMaxDateAndRegionCode(String[] inputs) {
         //ArrayList<Workplace> workplaces = getRegionWorkplaces(inputs);
         Region region = program.getRegionTree().find(new Region(Integer.parseInt(inputs[2])));
-        ArrayList<PCRTestDate> tests = region.getPcrTestDatePositiveTree().getInterval(new PCRTestDate(new PCRTestData(LocalDateTime.parse(inputs[5]),UUID.randomUUID())), new PCRTestDate(new PCRTestData(LocalDateTime.parse(inputs[6]),UUID.randomUUID())));
+        ArrayList<PCRTestDate> tests = region.getPcrTestDatePositiveTree(program.getPcrTestPositiveDateFile()).getInterval(new PCRTestDate(LocalDateTime.parse(inputs[5]),UUID.randomUUID()), new PCRTestDate(LocalDateTime.parse(inputs[6]),UUID.randomUUID()));
 
         /*for (Workplace workplace : workplaces) {
             tests.addAll(workplace.getPcrTestDatePositiveTree().getInterval(new PCRTestDate(new PCRTestData(LocalDateTime.parse(inputs[6]))), new PCRTestDate(new PCRTestData(LocalDateTime.parse(inputs[7])))));
@@ -249,7 +261,7 @@ public class Controller {
     private static void searchPCRTestMinMaxDateAndRegionCode(String[] inputs) {
         //ArrayList<Workplace> workplaces = getRegionWorkplaces(inputs);
         Region region = program.getRegionTree().find(new Region(Integer.parseInt(inputs[2])));
-        ArrayList<PCRTestDate> tests = region.getPcrTestDateTree().getInterval(new PCRTestDate(new PCRTestData(LocalDateTime.parse(inputs[5]),UUID.randomUUID())), new PCRTestDate(new PCRTestData(LocalDateTime.parse(inputs[6]),UUID.randomUUID())));
+        ArrayList<PCRTestDate> tests = region.getPcrTestDateTree(program.getPcrTestDateFile()).getInterval(new PCRTestDate(LocalDateTime.parse(inputs[5]),UUID.randomUUID()), new PCRTestDate(LocalDateTime.parse(inputs[6]),UUID.randomUUID()));
 
         /*for (Workplace workplace : workplaces) {
             tests.addAll(workplace.getPcrTestDateTree().getInterval(new PCRTestDate(new PCRTestData(LocalDateTime.parse(inputs[6]))), new PCRTestDate(new PCRTestData(LocalDateTime.parse(inputs[7])))));
@@ -270,13 +282,13 @@ public class Controller {
 
     //8
     private static void searchPCRTestPositiveDate(String[] inputs) {
-        ArrayList<PCRTestDate> tests = program.getPcrTestPositiveDateTree().getInterval(new PCRTestDate(new PCRTestData(LocalDateTime.parse(inputs[5]),UUID.randomUUID())), new PCRTestDate(new PCRTestData(LocalDateTime.parse(inputs[6]),UUID.randomUUID())));
+        ArrayList<PCRTestDate> tests = program.getPcrTestPositiveDateTree().getInterval(new PCRTestDate(LocalDateTime.parse(inputs[5]),UUID.randomUUID()), new PCRTestDate(LocalDateTime.parse(inputs[6]),UUID.randomUUID()));
         searchTableModel = new DefaultTableModel(getPCRTestDateDataToTable(tests), program.getPcrTestColumnNames());
     }
 
     //9
     private static void searchPCRTestDate(String[] inputs) {
-        ArrayList<PCRTestDate> tests = program.getPcrTestDateTree().getInterval(new PCRTestDate(new PCRTestData(LocalDateTime.parse(inputs[5]),UUID.randomUUID())), new PCRTestDate(new PCRTestData(LocalDateTime.parse(inputs[6]),UUID.randomUUID())));
+        ArrayList<PCRTestDate> tests = program.getPcrTestDateTree().getInterval(new PCRTestDate(LocalDateTime.parse(inputs[5]),UUID.randomUUID()), new PCRTestDate(LocalDateTime.parse(inputs[6]),UUID.randomUUID()));
         searchTableModel = new DefaultTableModel(getPCRTestDateDataToTable(tests), program.getPcrTestColumnNames());
     }
 
@@ -287,7 +299,13 @@ public class Controller {
         System.out.println(personIllFrom);
         System.out.println(LocalDateTime.parse(inputs[6]));
         District district = program.getDistrictTree().find(new District(Integer.parseInt(inputs[3])));
-        ArrayList<PCRTestDate> tests = district.getPcrTestDatePositiveTree().getInterval(new PCRTestDate(new PCRTestData(personIllFrom,UUID.randomUUID())), new PCRTestDate(new PCRTestData(LocalDateTime.parse(inputs[6]),UUID.randomUUID())));
+        /*ArrayList<PCRTestDate> testDates = district.getPcrTestDatePositiveTree(program.getPcrTestPositiveDateFile()).inOrder();
+        System.out.println();
+        for (int i = 0; i < testDates.size(); i++) {
+            System.out.println(testDates.get(i).getDateAndTimeOfTest());
+        }*/
+
+        ArrayList<PCRTestDate> tests = district.getPcrTestDatePositiveTree(program.getPcrTestPositiveDateFile()).getInterval(new PCRTestDate(personIllFrom,UUID.randomUUID()), new PCRTestDate(LocalDateTime.parse(inputs[6]),UUID.randomUUID()));
         getIllPersons(tests);
 
         /*for (Workplace workplace: district.getWorkPlaceTree().inOrder()) {
@@ -304,7 +322,7 @@ public class Controller {
     private static void getIllPersons(ArrayList<PCRTestDate> tests) {
         ArrayList<Person> persons = new ArrayList<>();
         for (PCRTestDate pcrTestDate : tests) {
-            persons.add(pcrTestDate.getPcrTestData().getPerson());
+            persons.add(program.getPerson(program.getPcrTestData(pcrTestDate.getPcrTestData()).getPerson()));
         }
         searchTableModel = getPersonsTable(persons);
     }
@@ -315,7 +333,7 @@ public class Controller {
         personIllFrom = personIllFrom.minusDays(Integer.parseInt(inputs[7]));
         //ArrayList<Workplace> workplaces = getRegionWorkplaces(inputs);
         Region region = program.getRegionTree().find(new Region(Integer.parseInt(inputs[2])));
-        ArrayList<PCRTestDate> tests = region.getPcrTestDatePositiveTree().getInterval(new PCRTestDate(new PCRTestData(personIllFrom,UUID.randomUUID())), new PCRTestDate(new PCRTestData(LocalDateTime.parse(inputs[6]),UUID.randomUUID())));
+        ArrayList<PCRTestDate> tests = region.getPcrTestDatePositiveTree(program.getPcrTestPositiveDateFile()).getInterval(new PCRTestDate(personIllFrom,UUID.randomUUID()), new PCRTestDate(LocalDateTime.parse(inputs[6]),UUID.randomUUID()));
         getIllPersons(tests);
 
         /*for (Workplace workplace : workplaces) {
@@ -333,7 +351,10 @@ public class Controller {
     private static void searchIllPerson(String[] inputs) {
         LocalDateTime personIllFrom = LocalDateTime.parse(inputs[6]);
         personIllFrom = personIllFrom.minusDays(Integer.parseInt(inputs[7]));
-        ArrayList<PCRTestDate> tests = program.getPcrTestPositiveDateTree().getInterval(new PCRTestDate(new PCRTestData(personIllFrom, UUID.randomUUID())), new PCRTestDate(new PCRTestData(LocalDateTime.parse(inputs[6]),UUID.randomUUID())));
+        System.out.println(personIllFrom);
+        System.out.println(LocalDateTime.parse(inputs[6]));
+        ArrayList<PCRTestDate> tests = program.getPcrTestPositiveDateTree().getInterval(new PCRTestDate(personIllFrom, UUID.randomUUID()), new PCRTestDate(LocalDateTime.parse(inputs[6]),UUID.randomUUID()));
+        System.out.println(tests.size());
         getIllPersons(tests);
 
         /*ArrayList<Person> persons = new ArrayList<>();
@@ -347,13 +368,13 @@ public class Controller {
     //13
     private static void searchCountIllPersonPerDistrict(String[] inputs) {
         ArrayList<District> districts = program.getDistrictTree().inOrder();
-        districts.sort(Comparator.comparingInt(o -> o.getNumberOfIllPersons(inputs)));
+        districts.sort(Comparator.comparingInt(o -> o.getNumberOfIllPersons(inputs, program.getPcrTestPositiveDateFile())));
         Collections.reverse(districts);
 
         String[][] data = new String[districts.size()][2];
         for (int i = 0; i < districts.size(); i++) {
             data[i][0] = districts.get(i).getDistrictCode() + "";
-            data[i][1] = districts.get(i).getNumberOfIllPersons(inputs) + "";
+            data[i][1] = districts.get(i).getNumberOfIllPersons(inputs, program.getPcrTestPositiveDateFile()) + "";
             districts.get(i).setNumberOfIllPersons();
         }
 
@@ -363,13 +384,13 @@ public class Controller {
     //14
     private static void searchCountIllPersonPerRegion(String[] inputs) {
         ArrayList<Region> regions = program.getRegionTree().inOrder();
-        regions.sort(Comparator.comparingInt(o -> o.getNumberOfIllPersons(inputs)));
+        regions.sort(Comparator.comparingInt(o -> o.getNumberOfIllPersons(inputs, program.getPcrTestPositiveDateFile())));
         Collections.reverse(regions);
 
         String[][] data = new String[regions.size()][2];
         for (int i = 0; i < regions.size(); i++) {
             data[i][0] = regions.get(i).getRegionCode() + "";
-            data[i][1] = regions.get(i).getNumberOfIllPersons(inputs) + "";
+            data[i][1] = regions.get(i).getNumberOfIllPersons(inputs, program.getPcrTestPositiveDateFile()) + "";
             regions.get(i).setNumberOfIllPersons();
         }
 
@@ -379,24 +400,26 @@ public class Controller {
     //15
     private static void searchPCRTestMinMaxDateAndWorkplaceCode(String[] inputs) {
         Workplace workplace = program.getWorkplaceTree().find(new Workplace(Integer.parseInt(inputs[4])));
-        ArrayList<PCRTestDate> tests = workplace.getPcrTestDateTree().getInterval(new PCRTestDate(new PCRTestData(LocalDateTime.parse(inputs[5]),UUID.randomUUID())), new PCRTestDate(new PCRTestData(LocalDateTime.parse(inputs[6]),UUID.randomUUID())));
+        ArrayList<PCRTestDate> tests = workplace.getPcrTestDateTree(program.getPcrTestDateFile()).getInterval(new PCRTestDate(LocalDateTime.parse(inputs[5]),UUID.randomUUID()), new PCRTestDate(LocalDateTime.parse(inputs[6]),UUID.randomUUID()));
         searchTableModel = new DefaultTableModel(getPCRTestDateDataToTable(tests), program.getPcrTestColumnNames());
     }
 
     private static String[][] getPCRTestDateDataToTable(ArrayList<PCRTestDate> tests) {
+        //System.out.println(tests.size() + " getPCRTestDateDataToTable");
         String[][] data = new String[tests.size()][8];
         Person person;
         PCRTestData pcrTestData;
         for (int i = 0; i < tests.size(); i++) {
-            pcrTestData = tests.get(i).getPcrTestData();
+            pcrTestData = program.getPcrTestData(tests.get(i).getPcrTestData());
+            //pcrTestData = tests.get(i).getPcrTestData();
             data[i][0] = pcrTestData.getTestCode() + "";
             data[i][1] = pcrTestData.getDateAndTimeOfTest() + "";
-            data[i][2] = pcrTestData.getResult();
-            person = pcrTestData.getPerson();
+            data[i][2] = pcrTestData.getResult() ? "Positive" : "Negative";
+            person = program.getPerson(pcrTestData.getPerson());
             if (person != null) {
-                data[i][3] = person.getName() + " " + person.getSurname() + " " + person.getIdNumber() + " " + person.getDateOfBirth();
+                data[i][3] = person.getName() + " " + person.getSurname() + " " + person.getIdNumber() + " " + person.getDateOfBirth().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
             } else {
-                System.out.println("Person null(DateData) big ERROR");
+                System.out.println("Person(UUID) null big ERROR");
             }
             data[i][4] = pcrTestData.getWorkplaceCode() + "";
             data[i][5] = pcrTestData.getDistrictCode() + "";
@@ -414,16 +437,14 @@ public class Controller {
         PCRTestData pcrTestData;
 
         for (int i = 0; i < tests.size(); i++) {
-            if (i % 100000  == 0) {
-                System.out.println(i);
-            }
-            pcrTestData = tests.get(i).getPcrTestData();
+            pcrTestData = program.getPcrTestData(tests.get(i).getPcrTestData());
+            //pcrTestData = tests.get(i).getPcrTestData();
             data[i][0] = pcrTestData.getTestCode() + "";
             data[i][1] = pcrTestData.getDateAndTimeOfTest() + "";
-            data[i][2] = pcrTestData.getResult();
-            person = pcrTestData.getPerson();
+            data[i][2] = pcrTestData.getResult() ? "Positive" : "Negative";
+            person = program.getPerson(pcrTestData.getPerson());
             if (person != null) {
-                data[i][3] = person.getName() + " " + person.getSurname() + " " + person.getIdNumber() + " " + person.getDateOfBirth();
+                data[i][3] = person.getName() + " " + person.getSurname() + " " + person.getIdNumber() + " " + person.getDateOfBirth().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
             } else {
                 System.out.println("Person(UUID) null big ERROR");
             }
@@ -432,6 +453,7 @@ public class Controller {
             data[i][6] = pcrTestData.getRegionCode() + "";
             data[i][7] = pcrTestData.getNote();
         }
+
         return new DefaultTableModel(data, program.getPcrTestColumnNames());
     }
 
@@ -455,52 +477,64 @@ public class Controller {
 
 
     public static void deletePCRTest(String pcrTestToCode) {
-        PCRTestData pcrTestData = program.getPcrTestUUIDTree().find(new PCRTestUUID(new PCRTestData(UUID.fromString(pcrTestToCode)))).getPcrTestData();
-        deletePCRTest(pcrTestData);
+        PCRTestUUID pcrTestUUID = program.getPcrTestUUIDTree().find(new PCRTestUUID(UUID.fromString(pcrTestToCode)));
+        PCRTestData pcrTestData = program.getPcrTestData(pcrTestUUID.getPcrTestData());
+
+        PCRTestDate pcrTestDate = program.getPcrTestDateTree().find(new PCRTestDate(pcrTestData.getDateAndTimeOfTest() , UUID.fromString(pcrTestToCode)));
+        PCRTestDate pcrTestPositiveDate = program.getPcrTestPositiveDateTree().find(new PCRTestDate(pcrTestData.getDateAndTimeOfTest(), UUID.fromString(pcrTestToCode)));
+
+        deletePCRTest(pcrTestData, pcrTestUUID, pcrTestDate, pcrTestPositiveDate);
     }
 
-    private static void deletePCRTest(PCRTestData pcrTestData) {
+    private static void deletePCRTest(PCRTestData pcrTestData, PCRTestUUID pcrTestUUID, PCRTestDate pcrTestDate, PCRTestDate pcrTestPositiveDate) {
         if (pcrTestData != null) {
-            PCRTestUUID pcrTestUUID = new PCRTestUUID(pcrTestData);
-            PCRTestDate pcrTestDate = new PCRTestDate(pcrTestData);
-            PCRTestNote pcrTestNote = new PCRTestNote(pcrTestData);
+            //PCRTestNote pcrTestNote = new PCRTestNote(pcrTestData);
+
+            Workplace workplace = program.getWorkplaceTree().find(new Workplace(pcrTestData.getWorkplaceCode()));
+            workplace.getPcrTestDateTree(program.getPcrTestDateFile()).delete(pcrTestDate);
+
+            //Person person = pcrTestData.getPerson();
+            Person person = program.getPerson(pcrTestData.getPerson());
+            person.getPcrTestDateTree(program.getPcrTestDateFile()).delete(pcrTestDate);
+            //person.getPcrTestUUIDTree().delete(pcrTestUUID);
+
+            //program.getGenerator().deletePCRTestDataFromList(pcrTestData);
+
+            District district = program.getDistrictFile().find(workplace.getDistrictAddress());
+            district.getPcrTestDateTree(program.getPcrTestDateFile()).delete(pcrTestDate);
+            //district.getPcrTestNoteTree().delete(pcrTestNote);
+
+            Region region = program.getRegionFile().find(district.getRegionAddress());
+            region.getPcrTestDateTree(program.getPcrTestDateFile()).delete(pcrTestDate);
 
             program.getPcrTestUUIDTree().delete(pcrTestUUID);
             program.getPcrTestDateTree().delete(pcrTestDate);
 
-            Workplace workplace = program.getWorkplaceTree().find(new Workplace(pcrTestData.getWorkplaceCode()));
-            workplace.getPcrTestDateTree().delete(pcrTestDate);
+            program.getPcrTestUUIDFile().delete(pcrTestUUID.getAddress());
+            program.getPcrTestDateFile().delete(pcrTestDate.getAddress());
 
-            Person person = pcrTestData.getPerson();
-            person.getPcrTestDateTree().delete(pcrTestDate);
-            person.getPcrTestUUIDTree().delete(pcrTestUUID);
+            if (pcrTestData.getResult()) {
+                workplace.getPcrTestDatePositiveTree(program.getPcrTestPositiveDateFile()).delete(pcrTestPositiveDate);
+                district.getPcrTestDatePositiveTree(program.getPcrTestPositiveDateFile()).delete(pcrTestPositiveDate);
+                region.getPcrTestDatePositiveTree(program.getPcrTestPositiveDateFile()).delete(pcrTestPositiveDate);
 
-            //program.getGenerator().deletePCRTestDataFromList(pcrTestData);
-
-            District district = program.getDistrictTree().find(workplace.getDistrict());
-            district.getPcrTestDateTree().delete(pcrTestDate);
-            district.getPcrTestNoteTree().delete(pcrTestNote);
-
-            Region region = program.getRegionTree().find(district.getRegion());
-            region.getPcrTestDateTree().delete(pcrTestDate);
-
-            if (pcrTestData.getResult().equals("Positive")) {
-                workplace.getPcrTestDatePositiveTree().delete(pcrTestDate);
-                district.getPcrTestDatePositiveTree().delete(pcrTestDate);
-                region.getPcrTestDatePositiveTree().delete(pcrTestDate);
-                program.getPcrTestPositiveDateTree().delete(pcrTestDate);
+                program.getPcrTestPositiveDateTree().delete(pcrTestPositiveDate);
+                program.getPcrTestPositiveDateFile().delete(pcrTestPositiveDate.getAddress());
             }
+
+            program.deletePcrTestData(pcrTestData.getAddress());
         }
     }
 
     public static void deletePerson(String idNumber) {
         Person person = program.getPersonTree().find(new Person(idNumber));
-        ArrayList<PCRTestUUID> pcrTestUUIDS = person.getPcrTestUUIDTree().inOrder();
-        for (PCRTestUUID pcrTestUUID : pcrTestUUIDS) {
-            deletePCRTest(pcrTestUUID.getPcrTestData());
+        ArrayList<PCRTestDate> pcrTestDates = person.getPcrTestDateTree(program.getPcrTestDateFile()).inOrder();
+        for (PCRTestDate pcrTestDate : pcrTestDates) {
+            deletePCRTest(pcrTestDate.getTestCode() + "");
         }
         program.getPersonTree().delete(person);
 
+        program.deletePerson(person.getAddress());
         program.getGenerator().deletePersonFromList(person);
     }
 
@@ -522,15 +556,6 @@ public class Controller {
                 sb.append(";");
             }
             sb.append('\n');
-
-            /*sb.append("Name");
-            sb.append(";");
-            sb.append("Surname");
-            sb.append(";");
-            sb.append("ID number");
-            sb.append(";");
-            sb.append("Birthday");
-            sb.append('\n');*/
 
             for (Person person : program.getPersonTree().inOrder()) {
                 sb.append(person.getName());
@@ -578,14 +603,15 @@ public class Controller {
             sb.append('\n');*/
 
             for (PCRTestUUID pcrTestUUID : program.getPcrTestUUIDTree().inOrder()) {
-                PCRTestData data = pcrTestUUID.getPcrTestData();
+                //PCRTestData data = pcrTestUUID.getPcrTestData();
+                PCRTestData data = program.getPcrTestData(pcrTestUUID.getPcrTestData());
                 sb.append(data.getTestCode());
                 sb.append(";");
                 sb.append(data.getDateAndTimeOfTest());
                 sb.append(";");
                 sb.append(data.getResult());
                 sb.append(";");
-                sb.append(data.getPerson().getIdNumber());
+                //sb.append(data.getPerson().getIdNumber());
                 sb.append(";");
                 sb.append(data.getWorkplaceCode());
                 sb.append(";");
@@ -661,5 +687,60 @@ public class Controller {
         catch (IOException e)
         {
         }
+    }
+
+    public static void writeOutSequence() {
+        /*System.out.println("som tu");
+        ArrayList<District> districts = program.getDistrictTree().inOrder();
+        BTree<PCRTestDate> pcrTestDateFile;
+        for (int i = 0; i < districts.size(); i++) {
+            System.out.println("district "+ districts.get(i).getDistrictCode());
+            //pcrTestDateFile = new UFile<>("files/persons/person_" + i +".txt", "files/persons/personFS_" + i +".txt", PCRTestDate.class);
+            pcrTestDateFile = districts.get(i).getPcrTestDatePositiveTree(program.getPcrTestDateFile());
+            ArrayList<PCRTestDate> dates =  pcrTestDateFile.inOrder();
+
+            for (int j = 0; j < dates.size(); j++) {
+                System.out.println(dates.get(j).getTestCode() + "  date code  " +  dates.get(j).getAddress() + "  date add  " +  program.getPerson(program.getPcrTestData(dates.get(j).getPcrTestData()).getPerson()).getIdNumber() + "  person  " +  program.getPcrTestData(dates.get(j).getPcrTestData()).getDistrictCode() +   " district ");
+            }
+        }*/
+        /*for (PCRTestData pcrTestData: program.getPcrTestDataFile().sequentialListing(0)) {
+            System.out.println(pcrTestData.isValid() + "   "  + pcrTestData.getTestCode());
+        }*/
+        UFile<PCRTestDate> pcrTestDateFile = new UFile<>("files/persons/person_" + 1 +".txt", "files/persons/personFS_" + 1 +".txt", PCRTestDate.class);
+        program.getPersonTree().inOrder().get(0).getPcrTestDateTree(pcrTestDateFile).getFileSequentialListing();
+        System.out.println();
+        program.getPersonTree().inOrder().get(0).getPcrTestDateTree(pcrTestDateFile).getFileSequentialListingFS();
+    }
+
+    public static void sequentialListing(String selectedItem) {
+        if (selectedItem.equals("Person Tree")) {
+            showListing(program.getPersonTree().getSequentialListing());
+        }
+        if (selectedItem.equals("PCRTestUUID Tree")) {
+            showListing(program.getPcrTestUUIDTree().getSequentialListing());
+        }
+        if (selectedItem.equals("PCRTestDate Tree")) {
+            showListing(program.getPcrTestDateTree().getSequentialListing());
+        }
+        if (selectedItem.equals("PCRTestPositiveDate Tree")) {
+            showListing(program.getPcrTestPositiveDateTree().getSequentialListing());
+        }
+    }
+
+    private static void showListing(ArrayList<String[]> sequentialListing) {
+
+        String[][] data = new String[sequentialListing.size()][8];
+
+        for (int i = 0; i < sequentialListing.size(); i++) {
+            data[i][0] = sequentialListing.get(i)[0];
+            data[i][1] = sequentialListing.get(i)[1];
+            data[i][2] = sequentialListing.get(i)[2];
+            data[i][3] = sequentialListing.get(i)[3];
+            data[i][4] = sequentialListing.get(i)[4];
+            data[i][5] = sequentialListing.get(i)[5];
+            data[i][6] = sequentialListing.get(i)[6];
+            data[i][7] = sequentialListing.get(i)[7];
+        }
+        searchTableModel = new DefaultTableModel(data, program.getTreeColumnNames());
     }
 }

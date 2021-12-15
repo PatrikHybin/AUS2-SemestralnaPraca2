@@ -25,6 +25,8 @@ public class AppGUI extends JFrame {
     private JButton saveButton;
     private JButton loadButton;
     private JLabel numberOfData;
+    private JButton outputSek;
+    private JButton seqListButton;
 
     Object[][] data;
 
@@ -52,7 +54,7 @@ public class AppGUI extends JFrame {
                 addPCRTestForm.setLocationRelativeTo(null);
                 addPCRTestForm.setVisible(true);
 
-                table.setModel(new DefaultTableModel(0,0));
+                //table.setModel(new DefaultTableModel(0,0));
                 table.setModel(Controller.getPCRTestsTable());
                 WriteNumberOfData();
             }
@@ -66,7 +68,7 @@ public class AppGUI extends JFrame {
                 addPersonForm.pack();
                 addPersonForm.setLocationRelativeTo(null);
                 addPersonForm.setVisible(true);
-                table.setModel(new DefaultTableModel(0,0));
+
                 table.setModel(Controller.getPersonsTable(null));
                 WriteNumberOfData();
                 /* cez list
@@ -81,7 +83,7 @@ public class AppGUI extends JFrame {
         showPCRTests.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                table.setModel(new DefaultTableModel(0,0));
+                //table.setModel(new DefaultTableModel(0,0));
                 table.setModel(Controller.getPCRTestsTable());
                 table.getColumn("Person").setPreferredWidth(350);
                 WriteNumberOfData();
@@ -156,6 +158,23 @@ public class AppGUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 Controller.load();
+            }
+        });
+        outputSek.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("sek click");
+                Controller.writeOutSequence();
+            }
+        });
+        seqListButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SequentialListingForm treeOutput = new SequentialListingForm();
+                treeOutput.pack();
+                treeOutput.setLocationRelativeTo(null);
+                treeOutput.setVisible(true);
+                table.setModel(Controller.getSearchedTable());
             }
         });
     }

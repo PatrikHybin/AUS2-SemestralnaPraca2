@@ -14,6 +14,7 @@ public class Generator {
     private ArrayList<District> districts = new ArrayList<>();
     private ArrayList<Workplace> workplaces = new ArrayList<>();
     private ArrayList<Person> persons = new ArrayList<>();
+    private Program program;
 
     private String[] names = new String[] {"James", "John", "Robert", "Michael", "William", "David", "Richard", "Joseph", "Thomas", "Charles", "Christopher","Ashley","Jacob","Lisa",
             "Daniel", "Matthew", "Anthony", "Donald", "Mark", "Paul", "Steven", "Andrew", "Kenneth", "Joshua", "Kevin", "Brian", "Edward", "Ronald", "Timothy", "Jason", "Jeffrey", "Ryan",
@@ -32,48 +33,69 @@ public class Generator {
             "Hannah", "Martha", "Jacqueline", "Frances", "Gloria", "Ann", "Teresa", "Kathryn", "Sara", "Janice", "Jean", "Alice", "Madison", "Doris", "Abigail", "Julia", "Judy", "Grace",
             "Denise", "Amber", "Marilyn", "Beverly", "Danielle", "Theresa", "Sophia", "Marie", "Diana", "Brittany", "Natalie", "Isabella", "Charlotte", "Rose", "Alexis", "Kayla"};
 
-    public Generator() {
+    public Generator(Program program) {
+        this.program = program;
         generateRegions();
         generateDistricts();
         generateWorkplaces();
     }
 
     private void generateRegions() {
-        for (int i = 0; i < 8; i++) {
-            regions.add(new Region(i + 1));
+        if (this.program.getRegionFile().getLength() == 0) {
+            for (int i = 0; i < 8; i++) {
+                Region region = new Region(i + 1);
+                regions.add(region);
+                this.program.getRegionFile().insert(region);
+                this.program.getRegionTree().insert(region);
+            }
+
         }
 
     }
 
     private void generateDistricts() {
-        int tmp;
-        for (int i = 0; i < regions.size(); i++) {
-            for (int j = 0; j < 9; j++) {
-                tmp = j + 1;
-                District district = new District(Integer.parseInt(regions.get(i).getRegionCode() + "" + tmp));
-                districts.add(district);
-                //regions.get(i).insertDistrict(district);
-                regions.get(i).getDistricts().add(district);
-                district.setRegion(regions.get(i));
+        if (this.program.getDistrictFile().getLength() == 0) {
+            int tmp;
+            for (int i = 0; i < regions.size(); i++) {
+                for (int j = 0; j < 9; j++) {
+                    tmp = j + 1;
+                    District district = new District(Integer.parseInt(regions.get(i).getRegionCode() + "" + tmp));
+                    districts.add(district);
+                    regions.get(i).getDistricts().add(district);
+                    district.setRegion(regions.get(i));
+                    this.program.getDistrictFile().insert(district);
+                    this.program.getDistrictTree().insert(district);
+                }
             }
+
         }
+
     }
 
     private void generateWorkplaces() {
-        int tmp;
-        for (int i = 0; i < districts.size(); i++) {
-            for (int j = 0; j < 3; j++) {
-                tmp = j + 1;
-                Workplace workplace = new Workplace(Integer.parseInt(districts.get(i).getDistrictCode() + "" + tmp));
-                workplaces.add(workplace);
-                //districts.get(i).insertWorkplace(workplace);
-                districts.get(i).getWorkplaces().add(workplace);
-                workplace.setDistrict(districts.get(i));
+        if (this.program.getWorkplaceFile().getLength() == 0) {
+            int tmp;
+            for (int i = 0; i < districts.size(); i++) {
+                for (int j = 0; j < 3; j++) {
+                    tmp = j + 1;
+                    Workplace workplace = new Workplace(Integer.parseInt(districts.get(i).getDistrictCode() + "" + tmp));
+                    workplaces.add(workplace);
+                    districts.get(i).getWorkplaces().add(workplace);
+                    workplace.setDistrict(districts.get(i));
+                    this.program.getWorkplaceFile().insert(workplace);
+                    this.program.getWorkplaceTree().insert(workplace);
+                }
             }
+
         }
+
     }
 
-    public void generatePersons(String number, Program program) {
+    public void generatePersons(String number) {
+        if (persons.size() == 0) {
+            persons.addAll(program.getPersonTree().inOrder());
+            System.out.println(persons.size() + " v generatePerson");
+        }
         int generateNum;
         if (number.equals("")) {
             generateNum = 0;
@@ -97,19 +119,23 @@ public class Generator {
             surname = names[r.nextInt(names.length)];
             randomDays = (int)(maxDays*Math.random());
             birthday = baseDate.plusDays(randomDays);
-            String idNumber = DateTimeFormatter.ofPattern("yyMMdd").format(birthday) + "/" + UUID.randomUUID().toString().substring(0,6);
-            Person person = new Person(name, surname, idNumber ,birthday);
-            persons.add(person);
+            String idNumber = DateTimeFormatter.ofPattern("yyMMdd").format(birthday) + "-" + UUID.randomUUID().toString().substring(0,6);
 
-            boolean outcome = program.getPersonTree().insert(person);
-            if (!outcome) {
+            Person person = new Person(name, surname, idNumber ,birthday, program.getPcrTestDateFile());
+
+            program.insertPerson(person);
+
+            if (program.getPersonTree().insert(person)) {
+                persons.add(person);
+            } else {
                 deletePersonFromList(person);
+                program.deletePerson(person.getAddress());
             }
         }
     }
 
 
-    public void generatePCRTests(String number, Program program) {
+    public void generatePCRTests(String number) {
         int generateNum;
         if (number.equals("")) {
             generateNum = 0;
@@ -119,54 +145,71 @@ public class Generator {
         Random r = new Random();
         Person person;
 
-
         LocalDateTime timeOfTest;
         LocalDate baseDate;
 
         LocalTime time;
-        String result;
+        boolean result;
         Workplace workplace;
         District district;
         Region region;
 
-
+        ArrayList<Person> treePersons = program.getPersonTree().inOrder();
+        System.out.println(treePersons.size() + " pocet osob");
         for (int i = 0; i < generateNum; i++) {
-            person = persons.get(r.nextInt(persons.size()));
+            person = program.getPerson(treePersons.get(r.nextInt(treePersons.size())).getAddress());
             baseDate = LocalDate.now().minusDays(r.nextInt(1000));
             time = LocalTime.MIN.plusSeconds(r.nextLong());
             timeOfTest = LocalDateTime.parse(baseDate + "T" + time.toString().substring(0,5));
 
             //timeOfTest = LocalDateTime.parse(localDate + "T" + String.format("%02d", r.nextInt(24)) + ":" + String.format("%02d",  r.nextInt(2) * 30));
             if (r.nextInt(100) < 50) {
-                result = "Positive";
+                result = true;
             } else {
-                result = "Negative";
+                result = false;
             }
+
+            //workplace = program.getWorkplaceTree().inOrder().get(r.nextInt(workplaces.size()));
+            ArrayList<Workplace> workplaces = program.getWorkplaceTree().inOrder();
+
             workplace = workplaces.get(r.nextInt(workplaces.size()));
-            district = workplace.getDistrict();
-            region = district.getRegion();
+            district = program.getDistrictFile().find(workplace.getDistrictAddress());
+            region = program.getRegionFile().find(district.getRegionAddress());
 
-            PCRTestData pcrTestData = new PCRTestData(UUID.randomUUID(), timeOfTest, result, person, workplace.getWorkplaceCode(), district.getDistrictCode() ,region.getRegionCode(), "Generated");
 
-            PCRTestUUID pcrTestUUID = new PCRTestUUID(pcrTestData);
-            PCRTestDate pcrTestDate = new PCRTestDate(pcrTestData);
-            PCRTestNote pcrTestNote = new PCRTestNote(pcrTestData);
+            PCRTestData pcrTestData = new PCRTestData(UUID.randomUUID(), timeOfTest, result, person.getAddress(), workplace.getWorkplaceCode(), district.getDistrictCode() ,region.getRegionCode(), "Generated");
 
+            program.insertPcrTestData(pcrTestData);
+
+            PCRTestUUID pcrTestUUID = new PCRTestUUID(pcrTestData.getAddress(), pcrTestData.getTestCode());
+            PCRTestDate pcrTestDate = new PCRTestDate(pcrTestData.getAddress(), pcrTestData.getDateAndTimeOfTest(), pcrTestData.getTestCode());
+            //PCRTestNote pcrTestNote = new PCRTestNote(pcrTestData);
+
+            program.getPcrTestUUIDFile().insert(pcrTestUUID);
             program.getPcrTestUUIDTree().insert(pcrTestUUID);
+
+            //program.getPcrTestDateFile().insert(pcrTestDate);
+            program.getPcrTestDateFile().insert(pcrTestDate);
             program.getPcrTestDateTree().insert(pcrTestDate);
-            if (pcrTestData.getResult() == "Positive") {
+
+            person.insertPCRTestDate(pcrTestDate, program.getPcrTestDateFile());
+
+
+            workplace.insertPCRTestDate(pcrTestDate, pcrTestData.getResult(), program.getPcrTestDateFile());
+            district.insertPCRTestDate(pcrTestDate, pcrTestData.getResult(), program.getPcrTestDateFile());
+            region.insertPCRTestDate(pcrTestDate, pcrTestData.getResult(), program.getPcrTestDateFile());
+
+
+            if (result) {
+
+                program.getPcrTestPositiveDateFile().insert(pcrTestDate);
                 program.getPcrTestPositiveDateTree().insert(pcrTestDate);
+
+                region.insertPCRTestDatePositive(pcrTestDate, pcrTestData.getResult(), program.getPcrTestPositiveDateFile());
+                district.insertPCRTestDatePositive(pcrTestDate, pcrTestData.getResult(), program.getPcrTestPositiveDateFile());
+                workplace.insertPCRTestDatePositive(pcrTestDate, pcrTestData.getResult(), program.getPcrTestPositiveDateFile());
+
             }
-
-            person.getPcrTestDateTree().insert(pcrTestDate);
-            person.getPcrTestUUIDTree().insert(pcrTestUUID);
-
-            workplace.insertPCRTestDate(pcrTestDate);
-            district.insertPCRTestDate(pcrTestDate);
-
-            district.getPcrTestNoteTree().insert(pcrTestNote);
-
-            region.insertPCRTestDate(pcrTestDate);
         }
     }
 

@@ -11,10 +11,12 @@ public class Main {
         Controller controller = new Controller(program);
         AppGUI appGUI = new AppGUI();
 
-        TwoThreeTreeTester tester = new TwoThreeTreeTester();
-        tester.testInsertDelete();
-        tester.testIntervalSearch();
-
-
+        Tester tester = new Tester();
+        //tester.testInsertDelete();
+        //tester.testIntervalSearch();
+        //tester.testFile();
+        //tester.testBTree();
+        //tester.metoda();
     }
+
 }

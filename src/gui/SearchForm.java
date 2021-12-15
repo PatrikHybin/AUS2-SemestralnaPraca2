@@ -112,7 +112,7 @@ public class SearchForm extends JDialog {
             }
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
-    //TODO(check if there is correct input)
+
     private void onOK() {
         //inputs[0] = getSearchTestResultInput();
         inputs[0] = getTestCodeInput();
