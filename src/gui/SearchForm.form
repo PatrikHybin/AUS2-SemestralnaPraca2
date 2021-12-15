@@ -195,15 +195,6 @@
               <toolTipText value="Vyhľadanie PCR testu podľa jeho kódu. "/>
             </properties>
           </component>
-          <component id="837eb" class="javax.swing.JCheckBox" binding="task20">
-            <constraints>
-              <grid row="3" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <text value="20"/>
-              <toolTipText value="Vyhladaj a usporiadaj testy podla poznamky zo zadaneho okresu"/>
-            </properties>
-          </component>
         </children>
       </grid>
       <grid id="d7f54" layout-manager="GridLayoutManager" row-count="2" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">

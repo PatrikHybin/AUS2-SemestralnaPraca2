@@ -25,6 +25,7 @@ public class SearchForm extends JDialog {
     private JCheckBox task10;
     private JCheckBox task13;
     private JCheckBox task15;
+    private JCheckBox task16;
     private JTextField testCodeInput;
     private JTextField personIdInput;
     private JLabel testCode;
@@ -39,8 +40,6 @@ public class SearchForm extends JDialog {
     private DatePicker maxDateInput;
     private DatePicker minDateInput;
     private JTextArea taskInfo;
-    private JCheckBox task16;
-    private JCheckBox task20;
     private ArrayList<JCheckBox> checkBoxes = new ArrayList<>();
     private String[] inputs = {null,null,null,null,null,null,null,null,null};
 
@@ -64,7 +63,6 @@ public class SearchForm extends JDialog {
         checkBoxes.add(task14);
         checkBoxes.add(task15);
         checkBoxes.add(task16);
-        checkBoxes.add(task20);
 
 
         for (JCheckBox checkBox: checkBoxes) {
