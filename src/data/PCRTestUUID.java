@@ -1,7 +1,5 @@
 package data;
 
-import com.IRecord;
-
 import java.io.*;
 import java.util.UUID;
 
@@ -56,7 +54,7 @@ public class PCRTestUUID implements IRecord<PCRTestUUID> {
             dataOutputStream.writeBoolean(this.isValid);
 
             dataOutputStream.writeChars(testCode + "");
-            //System.out.println("UUID zapis pre add " + this.address + "  " + testCode + "");
+
             dataOutputStream.writeLong(this.pcrTestData);
             dataOutputStream.writeLong(this.address);
 
@@ -79,7 +77,7 @@ public class PCRTestUUID implements IRecord<PCRTestUUID> {
             for (int i = 0; i < UUIDLength; i++) {
                 uuid += dataInputStream.readChar();
             }
-            //System.out.println("UUID citanie pre add " + this.address + "  " + uuid + "");
+
             this.testCode = UUID.fromString(uuid);
 
             this.pcrTestData = dataInputStream.readLong();
@@ -122,5 +120,10 @@ public class PCRTestUUID implements IRecord<PCRTestUUID> {
 
     public UUID getTestCode() {
         return testCode;
+    }
+
+    @Override
+    public String toString() {
+        return testCode + "  " + pcrTestData + "  " + address;
     }
 }

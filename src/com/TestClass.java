@@ -1,4 +1,6 @@
 package com;
+import data.IRecord;
+
 import java.io.*;
 import java.util.Random;
 

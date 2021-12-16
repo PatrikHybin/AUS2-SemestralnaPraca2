@@ -22,8 +22,6 @@ public class AppGUI extends JFrame {
     private JButton generateButton;
     private JButton deletePCRTestButton;
     private JButton deletePersonButton;
-    private JButton saveButton;
-    private JButton loadButton;
     private JLabel numberOfData;
     private JButton outputSek;
     private JButton seqListButton;
@@ -36,8 +34,6 @@ public class AppGUI extends JFrame {
         setTitle("Hello!");
         setSize(1024, 512);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        /*Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(dim.width/2 - this.getSize().width/2, dim.height/2 - this.getSize().height/2);*/
         setLocationRelativeTo(null);
         setVisible(true);
 
@@ -148,18 +144,6 @@ public class AppGUI extends JFrame {
             }
         });
 
-        saveButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Controller.save();
-            }
-        });
-        loadButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Controller.load();
-            }
-        });
         seqListButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

@@ -1,8 +1,5 @@
 package data;
 
-import com.UFile;
-import com.IRecord;
-
 import java.io.*;
 
 public class Workplace implements IRecord<Workplace> {

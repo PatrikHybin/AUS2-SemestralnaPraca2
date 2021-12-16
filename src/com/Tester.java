@@ -98,10 +98,6 @@ public class Tester {
         long seed = r.nextLong();
         r.setSeed(seed);
 
-        //TestClass test = new TestClass("Patrik", "Hybin", 50, 0.5);
-        //long myAdd = file.insert(test);
-
-
         double chance = 1;
         for (int i = 0; i < 10000; i++) {
             TestClass testClass;
@@ -156,14 +152,11 @@ public class Tester {
                 System.out.println("ERROR double");
             }
         }
-        //System.out.println(seed);
-        System.out.println("pocet v testovacom file " + addresses.size());
+
         file.clearFile();
-        //file.saveFreeSpaces();
     }
 
     public void testBTree() {
-        //person.getSize() - 125
         UFile<Person> personFile = new UFile<>("files/testPersonsData.txt", "files/testPersonsDataFreeSpace.txt", Person.class);
         BTree<Person> tree = new BTree<>(Person.class,"files/testPersons.txt", "files/testPersonsFreeSpace.txt", personFile);
 
@@ -183,25 +176,19 @@ public class Tester {
             Person person;
             double rand = r.nextDouble();
             if (i == 500) {
-                chance = 0;
+                chance = 0.5;
             }
 
-            //System.out.println(i + ": operacia");
             int num;
             if (rand < chance) {
                 num = r.nextInt(100000);
-                person = new Person(num + "", i + "S",   num + "" , LocalDate.now(), num, (double)num/10);
+                person = new Person(num + "", i + "S",   i + "" , LocalDate.now(), num, (double)num/10);
 
-                System.out.println(i + ": insert");
-                if (i > 25) {
-                    //tree.getFileSequence();
-                }
-                //System.out.println();
                 personFile.insert(person);
                 if (tree.insert(person)) {
                     treePersons.insert(person);
                     persons.add(person);
-                    //tree.getFileSequence();
+
                     countIns++;
                 } else {
                     personFile.delete(person.getAddress());
@@ -213,27 +200,15 @@ public class Tester {
                     continue;
                 }
 
-                System.out.println(i + ": delete");
-                //tree.getFileSequence();
-                //System.out.println();
                 int deleted = r.nextInt(persons.size());
-                //System.out.println(persons.get(deleted).getIdNumber());
                 treePersons.delete(persons.get(deleted));
                 tree.delete(persons.get(deleted));
                 personFile.delete(persons.get(deleted).getAddress());
                 persons.remove(deleted);
                 countDel++;
-                //tree.getFileSequence();
             }
-            //tree.inOrder();
         }
-        //Person ja = new Person("Patrik", "Hybin", 2+ "", LocalDate.now(), 2 , 0);
 
-        /*personFile.insert(ja);
-        tree.insert(ja);
-        persons.add(ja);
-
-        System.out.println(tree.find(ja).getName());*/
 
         System.out.println();
         System.out.println("seed " + seed);
@@ -262,17 +237,8 @@ public class Tester {
 
         System.out.println("insert: " + countIns + " delete: " + countDel + " same: " + countSame);
 
-
-        tree.getFileSequentialListing();
         System.out.println(persons.size() + " size");
 
-
-        System.out.println(personFile.getLength());
-        System.out.println();
-
-
-        System.out.println(tree.getFile().queueDeleted.size() + " + queue node deleted");
-        System.out.println(tree.getFile().queueDeletedReverse.size() + " + queueReverse node deleted");
 
         tree.saveFreeSpaces();
         //tree.clearFiles();
@@ -281,48 +247,5 @@ public class Tester {
 
     }
 
-    void metoda() {
-
-        UFile<Person> personFile = new UFile<>("files/testPersonsData.txt", "files/testPersonsDataFreeSpace.txt", Person.class);
-        System.out.println(personFile.getLength());
-        /*BTree<Person> tree = new BTree<>(Person.class,"files/testPersons.txt", "files/testPersonsFreeSpace.txt", personFile);
-        tree.getFileSequence();*/
-        /*Person ja = new Person("Pafdsfdsds", "Hybfdsdsa", 2+ "", LocalDate.now(), 2 , 0);
-        Person ty = new Person("Pafdsfdsds", "Hybfdsdsa", 4+ "", LocalDate.now(), 2 , 0);
-        ArrayList<Person> persons = tree.getInterval(ja, ty);
-        for (Person person : persons) {
-            System.out.println(person.getIdNumber());
-        }*/
-        /*int countValid = 0;
-        for (Person person: personFile.writeOutSequence(0)) {
-            if (person.isValid()) {
-                countValid++;
-                //System.out.println("f " + person.getIdNumber());
-            }
-        }
-
-        System.out.println();
-        System.out.println(countValid + "  valid v subore " + tree.inOrder().size() +  " v strome");
-        System.out.println();
-
-        while (personFile.getLength() > 8) {
-            tree.delete(personFile.find(personFile.getLength() - new Person().getSize()));
-            personFile.delete(personFile.getLength() - new Person().getSize());
-        }
-
-        System.out.println(personFile.getLength());
-
-        countValid = 0;
-        for (Person person: personFile.writeOutSequence(0)) {
-            if (person.isValid()) {
-                countValid++;
-                //System.out.println("f " + person.getIdNumber());
-            }
-        }
-
-        System.out.println();
-        System.out.println(countValid + "  valid v subore po delete " + tree.inOrder().size() +  " v strome po delete");
-        System.out.println();*/
-    }
 
 }

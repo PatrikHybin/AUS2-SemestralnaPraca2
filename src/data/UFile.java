@@ -1,7 +1,4 @@
-package com;
-import data.BTreeNode;
-import data.PCRTestDate;
-import data.Person;
+package data;
 
 import java.io.*;
 import java.util.ArrayList;

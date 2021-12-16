@@ -12,11 +12,8 @@ public class Main {
         AppGUI appGUI = new AppGUI();
 
         Tester tester = new Tester();
-        //tester.testInsertDelete();
-        //tester.testIntervalSearch();
-        //tester.testFile();
-        //tester.testBTree();
-        //tester.metoda();
+        tester.testFile();
+        tester.testBTree();
     }
 
 }

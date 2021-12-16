@@ -1,12 +1,7 @@
 package data;
 
-import com.IRecord;
-import com.UFile;
-import controller.Controller;
-
 import java.io.*;
 import java.time.LocalDate;
-import java.util.ArrayList;
 
 public class Person implements IRecord<Person> {
 
@@ -32,7 +27,6 @@ public class Person implements IRecord<Person> {
     private long address;
 
     private BTree<PCRTestDate> pcrTestDateTree;
-    //private BTree<PCRTestUUID> pcrTestUUIDTree = new BTree<>(PCRTestUUID.class);
 
 
     public Person() {
@@ -42,17 +36,6 @@ public class Person implements IRecord<Person> {
     public Person(String idNumber) {
         this.idNumber = idNumber;
     }
-
-    /*public Person(String name, String surname, String idNumber, LocalDate dateOfBirth) {
-        this.name = name;
-        this.nameLength = this.name.length();
-        this.surname = surname;
-        this.surnameLength = this.surname.length();
-        this.idNumber = idNumber;
-        this.idNumberLength = this.idNumber.length();
-        this.dateOfBirth = dateOfBirth;
-        this.pcrTestDateTree = new BTree<>(PCRTestDate.class);
-    }*/
 
     public Person(String name, String surname, String idNumber, LocalDate dateOfBirth, UFile<PCRTestDate> pcrTestDateFile) {
         this.name = name;
@@ -135,17 +118,9 @@ public class Person implements IRecord<Person> {
     private void loadTree(UFile<PCRTestDate> pcrTestDateFile) {
         if (pcrTestDateTree == null) {
             this.pcrTestDateTree = new BTree<>(PCRTestDate.class,"files/persons/person_" + idNumber +".txt","files/persons/personFS_" + idNumber +".txt", pcrTestDateFile);
-            //this.pcrTestDateTree = new BTree<>(PCRTestDate.class,"files/person_" + idNumber +".txt","files/personFS_" + idNumber +".txt", pcrTestDateFile);
         }
     }
 
-    //public BTree<PCRTestUUID> getPcrTestUUIDTree() {
-    //    return pcrTestUUIDTree;
-    //}
-
-    //public boolean insertPCRTestUUID(PCRTestUUID pcrTestUUID) {
-    //    return pcrTestUUIDTree.insert(pcrTestUUID);
-    //}
 
     public int getNumber() {
         return number;
@@ -269,4 +244,8 @@ public class Person implements IRecord<Person> {
         this.address = address;
     }
 
+    @Override
+    public String toString() {
+        return " " + name + '\'' + " " + surname + '\'' + " " + idNumber + '\'' + " " + dateOfBirth;
+    }
 }

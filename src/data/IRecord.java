@@ -1,4 +1,4 @@
-package com;
+package data;
 
 public interface IRecord<T> extends Comparable<T> {
 

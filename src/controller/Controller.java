@@ -2,11 +2,10 @@ package controller;
 
 import data.*;
 
-import com.UFile;
+import data.UFile;
 
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
-import javax.swing.text.DateFormatter;
 import java.io.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -18,6 +17,7 @@ public class Controller {
     private static Program program;
     private static DefaultTableModel searchTableModel;
 
+    private static long nullValue = -100;
     public Controller(Program prog) {
         program = prog;
     }
@@ -542,104 +542,6 @@ public class Controller {
         return searchTableModel;
     }
 
-    public static void save() {
-        savePersons();
-        savePcrTests();
-    }
-
-    private static void savePersons() {
-        try (PrintWriter writer = new PrintWriter("persons.csv")) {
-
-            StringBuilder sb = new StringBuilder();
-            for (String columnName: program.getPersonColumnNames()) {
-                sb.append(columnName);
-                sb.append(";");
-            }
-            sb.append('\n');
-
-            for (Person person : program.getPersonTree().inOrder()) {
-                sb.append(person.getName());
-                sb.append(";");
-                sb.append(person.getSurname());
-                sb.append(";");
-                sb.append(person.getIdNumber());
-                sb.append(";");
-                sb.append(person.getDateOfBirth());
-                sb.append(";");
-                sb.append('\n');
-            }
-
-            writer.write(sb.toString());
-
-        } catch (FileNotFoundException e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
-    private static void savePcrTests() {
-        try (PrintWriter writer = new PrintWriter("pcrTests.csv")) {
-
-            StringBuilder sb = new StringBuilder();
-            for (String columnName: program.getPcrTestColumnNames()) {
-                sb.append(columnName);
-                sb.append(";");
-            }
-            sb.append('\n');
-            /*sb.append("TestCode");
-            sb.append(";");
-            sb.append("TestTime");
-            sb.append(";");
-            sb.append("Result");
-            sb.append(";");
-            sb.append("Person ID number");
-            sb.append(";");
-            sb.append("Workplace Code");
-            sb.append(";");
-            sb.append("District Code");
-            sb.append(";");
-            sb.append("Region Code");
-            sb.append(";");
-            sb.append("Note");
-            sb.append('\n');*/
-
-            for (PCRTestUUID pcrTestUUID : program.getPcrTestUUIDTree().inOrder()) {
-                //PCRTestData data = pcrTestUUID.getPcrTestData();
-                PCRTestData data = program.getPcrTestData(pcrTestUUID.getPcrTestData());
-                sb.append(data.getTestCode());
-                sb.append(";");
-                sb.append(data.getDateAndTimeOfTest());
-                sb.append(";");
-                sb.append(data.getResult());
-                sb.append(";");
-                //sb.append(data.getPerson().getIdNumber());
-                sb.append(";");
-                sb.append(data.getWorkplaceCode());
-                sb.append(";");
-                sb.append(data.getDistrictCode());
-                sb.append(";");
-                sb.append(data.getRegionCode());
-                sb.append(";");
-                if (data.getNote().equals("")) {
-                    sb.append(data.getNote()).append(" ");
-                } else {
-                    sb.append(data.getNote());
-                }
-                sb.append(";");
-                sb.append('\n');
-            }
-
-            writer.write(sb.toString());
-
-        } catch (FileNotFoundException e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
-    public static void load() {
-        loadPersons();
-        loadPcrTests();
-    }
-
     private static void loadPersons() {
         String[] personData;
         String line;
@@ -689,41 +591,83 @@ public class Controller {
         }
     }
 
-    public static void writeOutSequence() {
-        /*System.out.println("som tu");
-        ArrayList<District> districts = program.getDistrictTree().inOrder();
-        BTree<PCRTestDate> pcrTestDateFile;
-        for (int i = 0; i < districts.size(); i++) {
-            System.out.println("district "+ districts.get(i).getDistrictCode());
-            //pcrTestDateFile = new UFile<>("files/persons/person_" + i +".txt", "files/persons/personFS_" + i +".txt", PCRTestDate.class);
-            pcrTestDateFile = districts.get(i).getPcrTestDatePositiveTree(program.getPcrTestDateFile());
-            ArrayList<PCRTestDate> dates =  pcrTestDateFile.inOrder();
-
-            for (int j = 0; j < dates.size(); j++) {
-                System.out.println(dates.get(j).getTestCode() + "  date code  " +  dates.get(j).getAddress() + "  date add  " +  program.getPerson(program.getPcrTestData(dates.get(j).getPcrTestData()).getPerson()).getIdNumber() + "  person  " +  program.getPcrTestData(dates.get(j).getPcrTestData()).getDistrictCode() +   " district ");
-            }
-        }*/
-        /*for (PCRTestData pcrTestData: program.getPcrTestDataFile().sequentialListing(0)) {
-            System.out.println(pcrTestData.isValid() + "   "  + pcrTestData.getTestCode());
-        }*/
-        UFile<PCRTestDate> pcrTestDateFile = new UFile<>("files/persons/person_" + 1 +".txt", "files/persons/personFS_" + 1 +".txt", PCRTestDate.class);
-        program.getPersonTree().inOrder().get(0).getPcrTestDateTree(pcrTestDateFile).getFileSequentialListing();
-        System.out.println();
-        program.getPersonTree().inOrder().get(0).getPcrTestDateTree(pcrTestDateFile).getFileSequentialListingFS();
-    }
-
     public static void sequentialListing(String selectedItem) {
+        long tmp;
+
         if (selectedItem.equals("Person Tree")) {
-            showListing(program.getPersonTree().getSequentialListing());
+            ArrayList<String[]> listing = program.getPersonTree().getSequentialListing();
+            String[][] data = new String[listing.size()][8];
+
+            for (int i = 0; i < listing.size(); i++) {
+                data[i][0] = listing.get(i)[0];
+                data[i][1] = listing.get(i)[1];
+                data[i][2] = listing.get(i)[2];
+                data[i][3] = listing.get(i)[3];
+                tmp = Long.parseLong(listing.get(i)[4]);
+                data[i][4] = tmp != nullValue ? program.getPerson(tmp).toString() : "";
+                tmp = Long.parseLong(listing.get(i)[5]);
+                data[i][5] = tmp != nullValue ? program.getPerson(tmp).toString() : "";
+                data[i][6] = listing.get(i)[6];
+                data[i][7] = listing.get(i)[7];
+            }
+            searchTableModel = new DefaultTableModel(data, program.getTreeColumnNames());
         }
         if (selectedItem.equals("PCRTestUUID Tree")) {
-            showListing(program.getPcrTestUUIDTree().getSequentialListing());
+            ArrayList<String[]> listing = program.getPcrTestUUIDTree().getSequentialListing();
+            String[][] data = new String[listing.size()][8];
+
+            for (int i = 0; i < listing.size(); i++) {
+                data[i][0] = listing.get(i)[0];
+                data[i][1] = listing.get(i)[1];
+                data[i][2] = listing.get(i)[2];
+                data[i][3] = listing.get(i)[3];
+                tmp = Long.parseLong(listing.get(i)[4]);
+                data[i][4] = tmp != nullValue ? program.getPcrTestUUIDFile().find(tmp).toString() : "";
+                tmp = Long.parseLong(listing.get(i)[5]);
+                data[i][5] = tmp != nullValue ? program.getPcrTestUUIDFile().find(tmp).toString() : "";
+                data[i][6] = listing.get(i)[6];
+                data[i][7] = listing.get(i)[7];
+            }
+            searchTableModel = new DefaultTableModel(data, program.getTreeColumnNames());
         }
         if (selectedItem.equals("PCRTestDate Tree")) {
-            showListing(program.getPcrTestDateTree().getSequentialListing());
+            ArrayList<String[]> listing = program.getPcrTestDateTree().getSequentialListing();
+            String[][] data = new String[listing.size()][8];
+
+            for (int i = 0; i < listing.size(); i++) {
+                data[i][0] = listing.get(i)[0];
+                data[i][1] = listing.get(i)[1];
+                data[i][2] = listing.get(i)[2];
+                data[i][3] = listing.get(i)[3];
+                tmp = Long.parseLong(listing.get(i)[4]);
+                data[i][4] = tmp != nullValue ? program.getPcrTestDateFile().find(tmp).toString() : "";
+                tmp = Long.parseLong(listing.get(i)[5]);
+                data[i][5] = tmp != nullValue ? program.getPcrTestDateFile().find(tmp).toString() : "";
+                data[i][6] = listing.get(i)[6];
+                data[i][7] = listing.get(i)[7];
+            }
+            searchTableModel = new DefaultTableModel(data, program.getTreeColumnNames());
+
         }
         if (selectedItem.equals("PCRTestPositiveDate Tree")) {
-            showListing(program.getPcrTestPositiveDateTree().getSequentialListing());
+
+            ArrayList<String[]> listing = program.getPcrTestPositiveDateTree().getSequentialListing();
+            String[][] data = new String[listing.size()][8];
+
+            for (int i = 0; i < listing.size(); i++) {
+                data[i][0] = listing.get(i)[0];
+                data[i][1] = listing.get(i)[1];
+                data[i][2] = listing.get(i)[2];
+                data[i][3] = listing.get(i)[3];
+                tmp = Long.parseLong(listing.get(i)[4]);
+                data[i][4] = tmp != nullValue ? program.getPcrTestPositiveDateFile().find(tmp).toString() : "";
+                tmp = Long.parseLong(listing.get(i)[5]);
+                data[i][5] = tmp != nullValue ? program.getPcrTestPositiveDateFile().find(tmp).toString() : "";
+                data[i][6] = listing.get(i)[6];
+                data[i][7] = listing.get(i)[7];
+            }
+            searchTableModel = new DefaultTableModel(data, program.getTreeColumnNames());
+
         }
     }
 

@@ -1,7 +1,5 @@
 package data;
 
-import com.UFile;
-
 import java.io.File;
 
 public class Program {
@@ -69,16 +67,6 @@ public class Program {
 
         this.generator = new Generator(this);
 
-        /*for (Region region : generator.getRegions()){
-            regionTree.insert(region);
-        }
-        for (District district : generator.getDistricts()){
-            districtFile.insert(district);
-
-        }
-        for (Workplace workplace : generator.getWorkplaces()){
-            workplaceTree.insert(workplace);
-        }*/
     }
 
     private void createDirs(File file) {

@@ -1,10 +1,7 @@
 package data;
 
-import com.IRecord;
-
 import java.io.*;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.TimeZone;
@@ -146,5 +143,10 @@ public class PCRTestDate implements IRecord<PCRTestDate> {
 
     public UUID getTestCode() {
         return testCode;
+    }
+
+    @Override
+    public String toString() {
+        return dateAndTimeOfTest + "  " + testCode + "  " + pcrTestData + "  " + address;
     }
 }

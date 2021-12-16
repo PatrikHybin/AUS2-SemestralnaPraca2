@@ -1,8 +1,5 @@
 package data;
 
-import com.UFile;
-import com.IRecord;
-
 import java.util.*;
 
 public class BTree<T extends IRecord<T>> implements IRecord<BTree<T>> {
@@ -10,9 +7,6 @@ public class BTree<T extends IRecord<T>> implements IRecord<BTree<T>> {
 
     //private BTreeNode<T> root;
     private long rootAddress = nullValue;
-
-
-    public int dataNum;
 
     public static final int case1 = 1;
     public static final int case2 = 2;
@@ -54,7 +48,6 @@ public class BTree<T extends IRecord<T>> implements IRecord<BTree<T>> {
             BTreeNode<T> tmpNode = new BTreeNode<T>(data, this.gClass);
             file.insert(tmpNode);
             rootAddress = tmpNode.getAddress();
-            dataNum++;
             file.updateTreeData(rootAddress);
             return true;
         }
@@ -63,7 +56,6 @@ public class BTree<T extends IRecord<T>> implements IRecord<BTree<T>> {
             tmpNode.setLeftData(data.getAddress());
             file.insertAtAddress(tmpNode, tmpNode.getAddress());
 
-            dataNum++;
             rootAddress = tmpNode.getAddress();
             file.updateTreeData(rootAddress);
             return true;
@@ -71,8 +63,7 @@ public class BTree<T extends IRecord<T>> implements IRecord<BTree<T>> {
 
         BTreeNode<T> node;
         if (find(data) == null) {
-            //System.out.println("mas kde insert");
-            dataNum++;
+
             node = findLeafNode(data);
             ArrayList<T> dataList;
             //leaf is 2node
@@ -121,7 +112,7 @@ public class BTree<T extends IRecord<T>> implements IRecord<BTree<T>> {
                         return true;
                     } else {
                         BTreeNode<T> nodeGetParent = file.find(node.getParent());
-                        //System.out.println(nodeGetParent.toString() + " " + this.rootAddress);
+
                         if (nodeGetParent.getRightData() == nullValue) {
                             //2node parent insert from left
                             if (node.getAddress() == nodeGetParent.getLeftSon()) {
@@ -130,7 +121,7 @@ public class BTree<T extends IRecord<T>> implements IRecord<BTree<T>> {
                             else {
                                 branch = 1;
                             }
-                            //node = node.getParent();
+
                             node = nodeGetParent;
 
                             node.setRightData(pushedNode.getLeftData());
@@ -148,8 +139,7 @@ public class BTree<T extends IRecord<T>> implements IRecord<BTree<T>> {
                                 node.setCenterSon(pushedNode.getCenterSon());
 
                                 file.insertAtAddress(node, node.getAddress());
-                                //file.insertAtAddress(node, node.getAddress());
-                                //node.getLeftSon().setParent(node);
+
                                 changeParentsAddressAtSon(node.getLeftSon(), node.getAddress());
                             }
                             if (branch == 1) {
@@ -160,11 +150,11 @@ public class BTree<T extends IRecord<T>> implements IRecord<BTree<T>> {
 
                                 node.setRightSon(pushedNode.getCenterSon());
 
-                                //node.getRightSon().setParent(node);
+
                                 changeParentsAddressAtSon(node.getRightSon(), node.getAddress());
 
                             }
-                            //node.getCenterSon().setParent(node);
+
                             changeParentsAddressAtSon(node.getCenterSon(), node.getAddress());
 
                             CorrectLeftAndRightData(node);
@@ -406,9 +396,8 @@ public class BTree<T extends IRecord<T>> implements IRecord<BTree<T>> {
             return;
         }
         BTreeNode<T> predecessor = inOrderPredecessor(node, data);
-        dataNum--;
         if (node.isLeaf()) {
-            //System.out.println("FROM LEAF");
+
             if (node.getRightData() != nullValue) {
                 if (dataFile.find(node.getLeftData()).compareTo(data) == 0) {
                     node.setLeftData(node.getRightData());
@@ -431,7 +420,7 @@ public class BTree<T extends IRecord<T>> implements IRecord<BTree<T>> {
                 System.out.println("predecessor is null problem");
                 return;
             }
-            //System.out.println("FROM !LEAF");
+
             if (node.getRightData() != nullValue) {
                 if (dataFile.find(node.getLeftData()).compareTo(data) == 0) {
                     if (predecessor.getRightData() != nullValue) {
@@ -506,43 +495,23 @@ public class BTree<T extends IRecord<T>> implements IRecord<BTree<T>> {
                 }
                 switch (caseNumber(node, branch)) {
                     case case1:
-                        //System.out.println("pripad " + case1);
+
                         node = deleteCase1(node, branch);
                         break;
                     case case2:
-                        //System.out.println("pripad " + case2);
                         deleteCase2(node, branch);
-                        /*root = file.find(root.getAddress());
-                        rootAddress = root.getAddress();
-                        file.updateTreeData(rootAddress);*/
                         return;
                     case case3a:
-                        //System.out.println("pripad " + case3a);
                         deleteCase3a(node, branch);
-                        /*root = file.find(root.getAddress());
-                        rootAddress = root.getAddress();
-                        file.updateTreeData(rootAddress);*/
                         return;
                     case case3b:
-                        //System.out.println("pripad " + case3b);
                         deleteCase3b(node, branch);
-                        /*root = file.find(root.getAddress());
-                        rootAddress = root.getAddress();
-                        file.updateTreeData(rootAddress);*/
                         return;
                     case case4a:
-                        //System.out.println("pripad " + case4a);
                         deleteCase4a(node, branch);
-                        /*root = file.find(root.getAddress());
-                        rootAddress = root.getAddress();
-                        file.updateTreeData(rootAddress);*/
                         return;
                     case case4b:
-                        //System.out.println("pripad " + case4b);
                         deleteCase4b(node, branch);
-                        /*root = file.find(root.getAddress());
-                        rootAddress = root.getAddress();
-                        file.updateTreeData(rootAddress);*/
                         return;
                     case -1:
                         System.out.println("Didnt find case that would match the problem");
@@ -832,16 +801,12 @@ public class BTree<T extends IRecord<T>> implements IRecord<BTree<T>> {
    //Implementovane podla vlastnych materialov
     public ArrayList<T> inOrder() {
 
-        if (dataNum < 0) {
-            dataNum = 0;
-        }
         if (rootAddress == nullValue) {
             return new ArrayList<>();
         }
-        ArrayList<T> list = new ArrayList<>(dataNum);
+        ArrayList<T> list = new ArrayList<>();
         BTreeNode<T> root = file.find(rootAddress);
         if (rootAddress == nullValue || (root.getLeftData() == nullValue && root.getRightData() == nullValue)) {
-            //System.out.println("There is no root or root has no data(inOrder)");
             return list;
         }
         root = file.find(root.getAddress());
@@ -856,7 +821,6 @@ public class BTree<T extends IRecord<T>> implements IRecord<BTree<T>> {
         nodeStack.push(node);
 
         while (nodeStack.size() != 0) {
-            //System.out.println("IDEME IN IRODER" + nodeStack.size() + "  adresa " + node.getAddress());
             if (nodeStack.peek() != node && node != root) {
                 nodeStack.push(node);
             }
@@ -921,7 +885,6 @@ public class BTree<T extends IRecord<T>> implements IRecord<BTree<T>> {
                             }
                         }
                     }
-                    //System.out.println("node stack size " + nodeStack.size() + " adresa " + node.getAddress());
                     nodeStack.pop();
                     if (nodeStack.size() != 0) {
                         level--;
@@ -1183,14 +1146,6 @@ public class BTree<T extends IRecord<T>> implements IRecord<BTree<T>> {
     @Override
     public int compareTo(BTree o) {
         return 0;
-    }
-
-    public long getFileLength() {
-        return this.file.getLength();
-    }
-
-    public long getFreeSpaceFileLength() {
-        return this.file.getFreeSpaceFileLength();
     }
 
     public ArrayList<BTreeNode<T>> getFileSequentialListing() {
