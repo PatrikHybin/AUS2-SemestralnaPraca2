@@ -69,6 +69,7 @@
                 <item value="PCRTestUUID Tree"/>
                 <item value="PCRTestDate Tree"/>
                 <item value="PCRTestPositiveDate Tree"/>
+                <item value="PCRTest Data"/>
               </model>
             </properties>
           </component>

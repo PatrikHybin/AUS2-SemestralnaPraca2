@@ -38,7 +38,7 @@ public class AppGUI extends JFrame {
         setVisible(true);
 
         table.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        table.setDefaultEditor(Object.class, null);
+        //table.setDefaultEditor(Object.class, null);
         table.setCellSelectionEnabled(true);
 
         addPCRTestButton.addActionListener(new ActionListener() {

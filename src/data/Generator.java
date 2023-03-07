@@ -94,7 +94,6 @@ public class Generator {
     public void generatePersons(String number) {
         if (persons.size() == 0) {
             persons.addAll(program.getPersonTree().inOrder());
-            System.out.println(persons.size() + " v generatePerson");
         }
         int generateNum;
         if (number.equals("")) {
@@ -155,7 +154,7 @@ public class Generator {
         Region region;
 
         ArrayList<Person> treePersons = program.getPersonTree().inOrder();
-        System.out.println(treePersons.size() + " pocet osob");
+
         for (int i = 0; i < generateNum; i++) {
             person = program.getPerson(treePersons.get(r.nextInt(treePersons.size())).getAddress());
             baseDate = LocalDate.now().minusDays(r.nextInt(1000));

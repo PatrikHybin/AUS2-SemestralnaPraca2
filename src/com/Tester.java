@@ -152,8 +152,8 @@ public class Tester {
                 System.out.println("ERROR double");
             }
         }
-
-        file.clearFile();
+        file.clearFiles();
+        //file.saveFreeSpaces();
     }
 
     public void testBTree() {

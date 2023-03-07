@@ -218,4 +218,19 @@ public class PCRTestData implements IRecord<PCRTestData> {
     public int compareTo(PCRTestData o) {
         return 0;
     }
+
+    @Override
+    public String toString() {
+        return " address=" + address +
+                ", isValid=" + isValid +
+                ", dateAndTimeOfTest=" + dateAndTimeOfTest +
+                ", person=" + person +
+                ", testCode=" + testCode +
+                ", workplaceCode=" + workplaceCode +
+                ", districtCode=" + districtCode +
+                ", regionCode=" + regionCode +
+                ", result=" + result +
+                ", note='" + note + '\'' +
+                '}';
+    }
 }

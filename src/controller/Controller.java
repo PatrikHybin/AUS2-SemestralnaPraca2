@@ -612,6 +612,7 @@ public class Controller {
             }
             searchTableModel = new DefaultTableModel(data, program.getTreeColumnNames());
         }
+
         if (selectedItem.equals("PCRTestUUID Tree")) {
             ArrayList<String[]> listing = program.getPcrTestUUIDTree().getSequentialListing();
             String[][] data = new String[listing.size()][8];
@@ -630,6 +631,7 @@ public class Controller {
             }
             searchTableModel = new DefaultTableModel(data, program.getTreeColumnNames());
         }
+
         if (selectedItem.equals("PCRTestDate Tree")) {
             ArrayList<String[]> listing = program.getPcrTestDateTree().getSequentialListing();
             String[][] data = new String[listing.size()][8];
@@ -649,6 +651,7 @@ public class Controller {
             searchTableModel = new DefaultTableModel(data, program.getTreeColumnNames());
 
         }
+
         if (selectedItem.equals("PCRTestPositiveDate Tree")) {
 
             ArrayList<String[]> listing = program.getPcrTestPositiveDateTree().getSequentialListing();
@@ -667,24 +670,21 @@ public class Controller {
                 data[i][7] = listing.get(i)[7];
             }
             searchTableModel = new DefaultTableModel(data, program.getTreeColumnNames());
+        }
 
+        if (selectedItem.equals("PCRTest Data")) {
+            showListingPCRData();
         }
     }
 
-    private static void showListing(ArrayList<String[]> sequentialListing) {
-
-        String[][] data = new String[sequentialListing.size()][8];
-
-        for (int i = 0; i < sequentialListing.size(); i++) {
-            data[i][0] = sequentialListing.get(i)[0];
-            data[i][1] = sequentialListing.get(i)[1];
-            data[i][2] = sequentialListing.get(i)[2];
-            data[i][3] = sequentialListing.get(i)[3];
-            data[i][4] = sequentialListing.get(i)[4];
-            data[i][5] = sequentialListing.get(i)[5];
-            data[i][6] = sequentialListing.get(i)[6];
-            data[i][7] = sequentialListing.get(i)[7];
+    private static void showListingPCRData() {
+        ArrayList<PCRTestData> listing = program.getPcrTestDataFile().sequentialListing(0);
+        String[] data = new String[listing.size()];
+        DefaultTableModel table = new DefaultTableModel();
+        for (int i = 0; i < listing.size(); i++) {
+            data[i] = listing.get(i).toString();
         }
-        searchTableModel = new DefaultTableModel(data, program.getTreeColumnNames());
+        table.addColumn("Vypis", data);
+        searchTableModel = table;
     }
 }
